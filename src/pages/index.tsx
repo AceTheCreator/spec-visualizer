@@ -1,79 +1,82 @@
-import Head from 'next/head'
-import Image from 'next/image'
-import { Inter } from '@next/font/google'
-import Tree from "react-d3-tree";
-import { useCenteredTree } from "../utils/helpers";
+import React, { useCallback, useEffect, useState } from 'react';
+import ReactFlow, { useNodesState, useEdgesState, addEdge, MiniMap, Controls } from 'reactflow';
+import 'reactflow/dist/style.css';
 
-const containerStyles = {
-  width: "100vw",
-  height: "100vh",
+const initialNodes = [
+  {
+    id: 'hidden-1',
+    type: 'input',
+    data: { label: 'Node 1' },
+    position: { x: 250, y: 5 },
+  },
+  { id: 'hidden-2', data: { label: 'Node 2' }, position: { x: 100, y: 100 } },
+  { id: 'hidden-3', data: { label: 'Node 3' }, position: { x: 400, y: 100 } },
+  { id: 'hidden-4', data: { label: 'Node 4' }, position: { x: 400, y: 200 } },
+];
+
+const initialEdges = [
+  { id: 'hidden-e1-2', source: 'hidden-1', target: 'hidden-2' },
+  { id: 'hidden-e1-3', source: 'hidden-1', target: 'hidden-3' },
+  { id: 'hidden-e3-4', source: 'hidden-3', target: 'hidden-4' },
+];
+
+const rfStyle = {
+  backgroundColor: "#B8CEFF",
+  width: "500px",
+  height: "300px"
 };
-
-
-const orgChart = {
-  name: "CEO",
-  children: [
-    {
-      name: "Manager",
-      attributes: {
-        department: "Production",
-      },
-      children: [
-        {
-          name: "Foreman",
-          attributes: {
-            department: "Fabrication",
-          },
-          children: [
-            {
-              name: "Worker",
-            },
-          ],
-        },
-        {
-          name: "Foreman",
-          attributes: {
-            department: "Assembly",
-          },
-          children: [
-            {
-              name: "Worker",
-            },
-          ],
-        },
-      ],
-    },
-  ],
-};
-
- // Here we're using `renderCustomNodeElement` to represent each node
-// as an SVG `rect` instead of the default `circle`.
-const renderRectSvgNode = ({ nodeDatum, toggleNode }) => (
-  <g>
-    <rect width="60" height="50" x="-10" onClick={toggleNode} />
-    <text fill="black" strokeWidth="1" x="20">
-      {nodeDatum.name}
-    </text>
-    {nodeDatum.attributes?.department && (
-      <text fill="black" x="20" dy="20" strokeWidth="1">
-        Department: {nodeDatum.attributes?.department}
-      </text>
-    )}
-  </g>
-);
 
 
 export default function Home() {
-    const [dimensions, translate, containerRef] = useCenteredTree();
+
+const hide = (hidden) => (nodeOrEdge) => {
+  nodeOrEdge.hidden = hidden;
+  return nodeOrEdge;
+};
+
+  const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
+  const [hidden, setHidden] = useState(false);
+
+  const onConnect = useCallback((params) => setEdges((els) => addEdge(params, els)), []);
+
+  useEffect(() => {
+    setNodes((nds) => nds.map(hide(hidden)));
+    setEdges((eds) => eds.map(hide(hidden)));
+  }, [hidden]);
+
+
   return (
-    <div style={containerStyles} ref={containerRef}>
-      <Tree
-        data={orgChart}
-        dimensions={dimensions}
-        translate={translate}
-        renderCustomNodeElement={renderRectSvgNode}
-        orientation="vertical"
-      />
+    <div style={{
+      width: "100%",
+      height: "100vh"
+    }}>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        onNodesChange={onNodesChange}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        style={rfStyle}
+      >
+        <MiniMap />
+        <Controls />
+
+        <div style={{ position: "absolute", left: 10, top: 10, zIndex: 4 }}>
+          <div>
+            <label htmlFor="ishidden">
+              isHidden
+              <input
+                id="ishidden"
+                type="checkbox"
+                checked={hidden}
+                onChange={(event) => setHidden(event.target.checked)}
+                className="react-flow__ishidden"
+              />
+            </label>
+          </div>
+        </div>
+      </ReactFlow>
     </div>
   );
 }
