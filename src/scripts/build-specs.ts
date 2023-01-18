@@ -3,9 +3,8 @@ import path, { resolve } from "path";
 import fetch from "node-fetch";
 
 async function createDir(name: string){
-  if(!existsSync(`src/configs/${name}`)){
-    console.log('jfj')
-      fs.mkdir(path.join("src/configs", name), (err) => {
+  if(!existsSync(`src/data/${name}`)){
+      fs.mkdir(path.join("src/data", name), (err) => {
         if (err) {
           return console.error(err);
         }
@@ -16,7 +15,7 @@ async function createDir(name: string){
 
 async function createFile(dir: string, name: string, data: string){
   writeFileSync(
-    resolve(__dirname, `../configs/${dir}`, name),
+    resolve(__dirname, `../data/${dir}`, name),
     data
   );
 }

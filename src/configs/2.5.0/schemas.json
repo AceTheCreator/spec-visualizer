@@ -1,1 +1,0 @@
-{"$id":"http://asyncapi.com/definitions/2.5.0/schemas.json","type":"object","additionalProperties":{"$ref":"http://asyncapi.com/definitions/2.5.0/schema.json"},"description":"JSON objects describing schemas the API uses."}
