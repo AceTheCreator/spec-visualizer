@@ -1,0 +1,1 @@
+{"$id":"http://asyncapi.com/definitions/2.5.0/channels.json","type":"object","propertyNames":{"type":"string","format":"uri-template","minLength":1},"additionalProperties":{"$ref":"http://asyncapi.com/definitions/2.5.0/channelItem.json"}}

@@ -1,0 +1,1 @@
+{"$id":"http://asyncapi.com/definitions/2.5.0/specificationExtension.json","description":"Any property starting with x- is valid.","additionalProperties":true,"additionalItems":true}

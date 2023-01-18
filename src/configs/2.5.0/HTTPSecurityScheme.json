@@ -1,0 +1,1 @@
+{"$id":"http://asyncapi.com/definitions/2.5.0/HTTPSecurityScheme.json","oneOf":[{"$ref":"http://asyncapi.com/definitions/2.5.0/NonBearerHTTPSecurityScheme.json"},{"$ref":"http://asyncapi.com/definitions/2.5.0/BearerHTTPSecurityScheme.json"},{"$ref":"http://asyncapi.com/definitions/2.5.0/APIKeyHTTPSecurityScheme.json"}]}
