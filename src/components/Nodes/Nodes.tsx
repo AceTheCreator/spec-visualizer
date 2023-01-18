@@ -1,4 +1,5 @@
-import React, { useCallback, useEffect, useRef, useState } from "react";
+/* eslint-disable import/no-anonymous-default-export */
+import React, { useCallback, useEffect, useRef } from "react";
 import ReactFlow, {
   useNodesState,
   useEdgesState,
@@ -33,49 +34,6 @@ const initialNodes = [
           },
         ],
       },
-      {
-        id: "5",
-        name: "b",
-        parent: "1",
-        children: [
-          {
-            id: "6",
-            name: "c",
-            parent: "5",
-            children: [
-              {
-                id: "7",
-                parent: "6",
-                name: "d",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: "8",
-        name: "b",
-        parent: "1",
-        children: [
-          {
-            id: "9",
-            name: "c",
-            parent: "8",
-            children: [
-              {
-                id: "10",
-                parent: "9",
-                name: "d",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        id: "11",
-        name: "f",
-        parent: "1",
-      },
     ],
   },
 ];
@@ -102,12 +60,13 @@ const fitViewOptions = {
   padding: 1,
 };
 
-const Nodes = (props) => {
+const Nodes = (props: any) => {
   const reactFlowWrapper = useRef(null);
   const [nodes, setNodes, onNodesChange] = useNodesState([]);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
   const onConnect = useCallback(
     (params) => setEdges((eds) => addEdge(params, eds)),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
@@ -124,6 +83,7 @@ const Nodes = (props) => {
         };
       }),
     ]);
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const handleNodeClick = (e, data) => {
@@ -193,6 +153,7 @@ const Nodes = (props) => {
   );
 };
 
+// eslint-disable-next-line react/display-name
 export default () => (
   <ReactFlowProvider>
     <Nodes />
