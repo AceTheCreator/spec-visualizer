@@ -36,11 +36,16 @@ export default async function buildSpecs() {
     if(properties){
       // create spec directory
       await createDir(specVersion)
+      // console.log(properties['$ref'])
+      await createFile(specVersion, 'asyncapi.json', JSON.stringify(properties));
+    }
+
+    if(definitions){
       // write all definations to spec directory
       for (const definition in definitions) {
         const title = definition.split("/").slice(-1)[0];
         const scope = definitions[definition];
-       await createFile(specVersion, title, JSON.stringify(scope));
+        await createFile(specVersion, title, JSON.stringify(scope));
       }
     }
 

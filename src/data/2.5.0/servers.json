@@ -1,0 +1,1 @@
+{"$id":"http://asyncapi.com/definitions/2.5.0/servers.json","description":"An object representing multiple servers.","type":"object","additionalProperties":{"oneOf":[{"$ref":"http://asyncapi.com/definitions/2.5.0/Reference.json"},{"$ref":"http://asyncapi.com/definitions/2.5.0/server.json"}]}}

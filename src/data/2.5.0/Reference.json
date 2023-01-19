@@ -1,0 +1,1 @@
+{"$id":"http://asyncapi.com/definitions/2.5.0/Reference.json","type":"object","required":["$ref"],"properties":{"$ref":{"$ref":"http://asyncapi.com/definitions/2.5.0/ReferenceObject.json"}}}

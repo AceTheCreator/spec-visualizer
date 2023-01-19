@@ -1,0 +1,1 @@
+{"$id":"http://asyncapi.com/definitions/2.5.0/bindingsObject.json","type":"object","additionalProperties":true,"properties":{"http":{},"ws":{},"amqp":{},"amqp1":{},"mqtt":{},"mqtt5":{},"kafka":{},"anypointmq":{},"nats":{},"jms":{},"sns":{},"sqs":{},"stomp":{},"redis":{},"ibmmq":{},"solace":{}}}
