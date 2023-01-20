@@ -10,35 +10,6 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import initialNodes from '../../configs/2.5.0.json';
 
-
-// const initialNodes = [
-//   {
-//     id: "1",
-//     name: "a",
-//     children: [
-//       {
-//         id: "2",
-//         name: "b",
-//         parent: "1",
-//         children: [
-//           {
-//             id: "3",
-//             name: "c",
-//             parent: "2",
-//             children: [
-//               {
-//                 id: "4",
-//                 parent: "3",
-//                 name: "d",
-//               },
-//             ],
-//           },
-//         ],
-//       },
-//     ],
-//   },
-// ];
-
 const initialEdges = [
   {
     id: "edges-e5-7",
@@ -146,8 +117,6 @@ const Nodes = (props: any) => {
         onConnect={onConnect}
         onNodeClick={handleNodeClick}
         fitView
-        onHov
-        maxZoom={0.9}
         defaultViewport={{ x: 1, y: 1, zoom: 0.5 }}
         fitViewOptions={fitViewOptions}
       />
