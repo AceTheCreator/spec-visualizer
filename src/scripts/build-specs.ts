@@ -36,8 +36,12 @@ export default async function buildSpecs() {
     if(properties){
       // create spec directory
       await createDir(specVersion)
-      // console.log(properties['$ref'])
       await createFile(specVersion, 'asyncapi.json', JSON.stringify(properties));
+      // Create default spec config json
+      const filePath = "src/data/2.5.0/asyncapi.json";
+       const fileContent: any = fs.readFileSync(filePath, "utf-8");
+       const data = JSON.parse(fileContent);
+       console.log(data)
     }
 
     if(definitions){
