@@ -1,5 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
 import React, { useCallback, useEffect, useRef } from "react";
+import { SmartBezierEdge } from "@tisoap/react-flow-smart-edge";
 import ReactFlow, {
   useNodesState,
   useEdgesState,
@@ -24,9 +25,6 @@ const initialEdges = [
     },
   },
 ];
-
-let id = 1;
-const getId = () => `${id++}`;
 
 const fitViewOptions = {
   padding: 1,
@@ -99,6 +97,9 @@ const Nodes = (props: any) => {
       setEdges([...edges.filter((item) => data.id !== item.source)]);
     }
   };
+const edgeTypes = {
+  smart: SmartBezierEdge,
+};
 
   return (
     <div
@@ -112,6 +113,7 @@ const Nodes = (props: any) => {
       <ReactFlow
         nodes={nodes}
         edges={edges}
+        edgeTypes = {edgeTypes}
         onNodesChange={onNodesChange}
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}

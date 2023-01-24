@@ -200,6 +200,13 @@
   dependencies:
     "tslib" "^2.4.0"
 
+"@tisoap/react-flow-smart-edge@^3.0.0":
+  "integrity" "sha512-XtEQT0IrOqPwJvCzgEoj3Y16/EK4SOcjZO7FmOPU+qJWmgYjeTyv7J35CGm6dFeJYdZ2gHDrvQ1zwaXuo23/8g=="
+  "resolved" "https://registry.npmjs.org/@tisoap/react-flow-smart-edge/-/react-flow-smart-edge-3.0.0.tgz"
+  "version" "3.0.0"
+  dependencies:
+    "pathfinding" "0.4.18"
+
 "@types/d3-array@*":
   "integrity" "sha512-nwvEkG9vYOc0Ic7G7kwgviY4AQlTfYGIZ0fqB7CQHXGyYM6nO7kJh5EguSNA3jfh4rq7Sb7eMVq8isuvg2/miQ=="
   "resolved" "https://registry.npmjs.org/@types/d3-array/-/d3-array-3.0.4.tgz"
@@ -1506,6 +1513,11 @@
   dependencies:
     "function-bind" "^1.1.1"
 
+"heap@0.2.5":
+  "integrity" "sha512-G7HLD+WKcrOyJP5VQwYZNC3Z6FcQ7YYjEFiFoIj8PfEr73mu421o8B1N5DKUcc8K37EsJ2XXWA8DtrDz/2dReg=="
+  "resolved" "https://registry.npmjs.org/heap/-/heap-0.2.5.tgz"
+  "version" "0.2.5"
+
 "ignore@^5.2.0":
   "integrity" "sha512-MAb38BcSbH0eHNBxn7ql2NH/kX33OkB3lZ1BNdh7ENeRChHTYsTvWrMubiIAMNS2llXEEgZ1MUOBtXChP3kaFQ=="
   "resolved" "https://registry.npmjs.org/ignore/-/ignore-5.2.4.tgz"
@@ -2032,6 +2044,13 @@
   "resolved" "https://registry.npmjs.org/path-type/-/path-type-4.0.0.tgz"
   "version" "4.0.0"
 
+"pathfinding@0.4.18":
+  "integrity" "sha512-R0TGEQ9GRcFCDvAWlJAWC+KGJ9SLbW4c0nuZRcioVlXVTlw+F5RvXQ8SQgSqI9KXWC1ew95vgmIiyaWTlCe9Ag=="
+  "resolved" "https://registry.npmjs.org/pathfinding/-/pathfinding-0.4.18.tgz"
+  "version" "0.4.18"
+  dependencies:
+    "heap" "0.2.5"
+
 "picocolors@^1.0.0":
   "integrity" "sha512-1fygroTLlHu66zi26VoTDv8yRgm0Fccecssto+MhsZ0D/DGW2sm8E8AjW7NU5VVTRt5GxbeZ5qBuJr+HyLYkjQ=="
   "resolved" "https://registry.npmjs.org/picocolors/-/picocolors-1.0.0.tgz"
@@ -2115,7 +2134,7 @@
   dependencies:
     "loose-envify" "^1.1.0"
 
-"reactflow@^11.4.2":
+"reactflow@^11.4.2", "reactflow@>=11":
   "integrity" "sha512-kedccI6S/+/Fj+MFqEqb5bUncyTsr5DTxeAG5TZ6QB6wwNEE6KG3UFsqRaa1wbOtKnEWwOOupq0fDPE1ePUAZQ=="
   "resolved" "https://registry.npmjs.org/reactflow/-/reactflow-11.4.2.tgz"
   "version" "11.4.2"
@@ -2431,7 +2450,7 @@
     "for-each" "^0.3.3"
     "is-typed-array" "^1.1.9"
 
-"typescript@>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta", "typescript@>=3.3.1", "typescript@4.9.4":
+"typescript@>=2.8.0 || >= 3.2.0-dev || >= 3.3.0-dev || >= 3.4.0-dev || >= 3.5.0-dev || >= 3.6.0-dev || >= 3.6.0-beta || >= 3.7.0-dev || >= 3.7.0-beta", "typescript@>=3.3.1", "typescript@>=4.6", "typescript@4.9.4":
   "integrity" "sha512-Uz+dTXYzxXXbsFpM86Wh3dKCxrQqUcVMxwU54orwlJjOpO3ao8L7j5lH+dWfTwgCwIuM9GQ2kvVotzYJMXTBZg=="
   "resolved" "https://registry.npmjs.org/typescript/-/typescript-4.9.4.tgz"
   "version" "4.9.4"
