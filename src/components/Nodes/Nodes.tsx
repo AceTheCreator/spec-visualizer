@@ -89,6 +89,18 @@ const Nodes = (props: any) => {
     []
   );
 
+    const onLayout = useCallback(
+      (direction) => {
+        const { nodes: layoutedNodes, edges: layoutedEdges } =
+          getLayoutedElements(nodes, edges, direction);
+
+        setNodes([...layoutedNodes]);
+        setEdges([...layoutedEdges]);
+      },
+      [nodes, edges]
+    );
+
+
   const focusNode = (x: number, y: number, zoom: number) => {
     setCenter(x, y, { zoom, duration: 1000 });
   };
@@ -122,19 +134,16 @@ const Nodes = (props: any) => {
               children: item.children,
               parent: item.parent,
             },
-            position: {
-              x: data.position.x + 300,
-              y: i === 0 ? data.position.y : data.position.y + i * 50,
-            },
+            // position: {
+            //   x: data.position.x + 300,
+            //   y: i === 0 ? data.position.y : data.position.y + i * 50,
+            // },
             sourcePosition: "right",
             targetPosition: "left",
             expandParent: true,
           };
         }),
       ];
-      if (itemChildren.length) {
-        focusNode(itemChildren[0].position.x, itemChildren[0].position.y, 1.85);
-      }
       const newEdges = [
         ...edges,
         ...itemChildren.map((item) => {
@@ -150,9 +159,12 @@ const Nodes = (props: any) => {
       ];
       const newNodes = nodes.concat(itemChildren);
       const { nodes: layoutedNodes, edges: layoutedEdges } =
-        getLayoutedElements(newNodes, newEdges, "LR");
+      getLayoutedElements(newNodes, newEdges, "LR");
       setNodes([...layoutedNodes]);
       setEdges([...layoutedEdges]);
+      if (itemChildren.length) {
+        focusNode(itemChildren[3].position.x, itemChildren[3].position.y, 1.85);
+      }
     } else {
       setNodes([...nodes.filter((item) => item?.data?.parent !== data.id)]);
       setEdges([...edges.filter((item) => data.id !== item.source)]);
