@@ -56,13 +56,10 @@ const getLayoutedElements = (nodes: any, edges: any, direction = "TB") => {
     node.targetPosition = isHorizontal ? "left" : "top";
     node.sourcePosition = isHorizontal ? "right" : "bottom";
 
-    // We are shifting the dagre node position (anchor=center center) to the top left
-    // so it matches the React Flow node anchor point (top left).
     node.position = {
       x: nodeWithPosition.x - nodeWidth / 2,
       y: nodeWithPosition.y - nodeHeight / 2,
     };
-    console.log(node)
     return node;
   });
 
@@ -75,32 +72,10 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
 );
 
 const Nodes = (props: any) => {
-    const store = useStoreApi();
-    const nodesInitialized = useNodesInitialized();
   const reactFlowWrapper = useRef(null);
-  const {setCenter } = useReactFlow();
+  const { setCenter } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
-
-    useEffect(() => {
-      const updatedNode = {
-        id: "my node",
-        type: "input",
-        data: { label: "input" },
-        position: { x: 0, y: 0 },
-      };
-      setNodes(() => [updatedNode]);
-    }, [setNodes]);
-
-    useEffect(() => {
-      if (nodesInitialized) {
-        const { nodeInternals } = store.getState();
-        const currNodes = Array.from(nodeInternals.values());
-        // The node printed here won't have a width or height in some cases
-        console.log(currNodes);
-      }
-    }, [nodesInitialized, store]);
-
 
   const onConnect = useCallback(
     (params) =>
@@ -113,19 +88,9 @@ const Nodes = (props: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-    const onLayout = useCallback(
-      (direction) => {
-        const { nodes: layoutedNodes, edges: layoutedEdges } =
-          getLayoutedElements(nodes, edges, direction);
-
-        setNodes([...layoutedNodes]);
-        setEdges([...layoutedEdges]);
-      },
-      [nodes, edges]
-    );
 
   const focusNode = (x: number, y: number, zoom: number) => {
-      setCenter(x, y, { zoom, duration: 1000 });
+    setCenter(x, y, { zoom, duration: 1000 });
   };
 
   useEffect(() => {
@@ -145,7 +110,6 @@ const Nodes = (props: any) => {
   }, []);
 
   const handleNodeClick = (e, data) => {
-    onLayout("LR");
     const findChildren = nodes.filter((item) => item?.data?.parent === data.id);
     if (!findChildren.length) {
       const itemChildren = [
@@ -164,14 +128,14 @@ const Nodes = (props: any) => {
             },
             sourcePosition: "right",
             targetPosition: "left",
-            expandParent: true
+            expandParent: true,
           };
         }),
       ];
-      if(itemChildren.length){
+      if (itemChildren.length) {
         focusNode(itemChildren[0].position.x, itemChildren[0].position.y, 1.85);
       }
-      setEdges([
+      const newEdges = [
         ...edges,
         ...itemChildren.map((item) => {
           return {
@@ -183,8 +147,12 @@ const Nodes = (props: any) => {
             },
           };
         }),
-      ]);
-      setNodes(nodes.concat(itemChildren));
+      ];
+      const newNodes = nodes.concat(itemChildren);
+      const { nodes: layoutedNodes, edges: layoutedEdges } =
+        getLayoutedElements(newNodes, newEdges, "LR");
+      setNodes([...layoutedNodes]);
+      setEdges([...layoutedEdges]);
     } else {
       setNodes([...nodes.filter((item) => item?.data?.parent !== data.id)]);
       setEdges([...edges.filter((item) => data.id !== item.source)]);
