@@ -73,7 +73,7 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
 
 const Nodes = (props: any) => {
   const reactFlowWrapper = useRef(null);
-  const { setCenter } = useReactFlow();
+  const { setCenter, reactFlowInstance } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
@@ -88,18 +88,6 @@ const Nodes = (props: any) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
-
-    const onLayout = useCallback(
-      (direction) => {
-        const { nodes: layoutedNodes, edges: layoutedEdges } =
-          getLayoutedElements(nodes, edges, direction);
-
-        setNodes([...layoutedNodes]);
-        setEdges([...layoutedEdges]);
-      },
-      [nodes, edges]
-    );
-
 
   const focusNode = (x: number, y: number, zoom: number) => {
     setCenter(x, y, { zoom, duration: 1000 });
@@ -134,13 +122,8 @@ const Nodes = (props: any) => {
               children: item.children,
               parent: item.parent,
             },
-            // position: {
-            //   x: data.position.x + 300,
-            //   y: i === 0 ? data.position.y : data.position.y + i * 50,
-            // },
             sourcePosition: "right",
             targetPosition: "left",
-            expandParent: true,
           };
         }),
       ];
@@ -166,11 +149,39 @@ const Nodes = (props: any) => {
         focusNode(itemChildren[3].position.x, itemChildren[3].position.y, 1.85);
       }
     } else {
-      setNodes([...nodes.filter((item) => item?.data?.parent !== data.id)]);
+      const newNodes = removeChildren(data.data, nodes)
+      setNodes([...newNodes]);
       setEdges([...edges.filter((item) => data.id !== item.source)]);
     }
-    // focusNode(findChildren);
   };
+    var removeByAttr = function (arr, attr, value) {
+      var i = arr.length;
+      while (i--) {
+        if (
+          arr[i] &&
+          arr[i].hasOwnProperty(attr) &&
+          arguments.length > 2 &&
+          arr[i][attr] === value
+        ) {
+          arr.splice(i, 1);
+        }
+      }
+      return arr;
+    };
+  function removeChildren(parentNode: any, nodes: any){
+    let newNodes = nodes
+   const children = parentNode.children;
+   if(children.length > 0){
+    for(let i = 0; i < children.length; i++){
+      newNodes = removeByAttr(nodes, 'id', children[i].id)
+      if(children[i].children.length > 0){
+        console.log('holla')
+        removeChildren(children[i], newNodes)
+      }
+    }
+   }
+   return newNodes
+  }
   const edgeTypes = {
     smart: SmartBezierEdge,
   };

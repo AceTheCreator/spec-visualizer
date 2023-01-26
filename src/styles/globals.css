@@ -1,7 +1,4 @@
-.node-title {
-  dx: -200;
-  fill: green;
-}
-
-.node-label {
+.react-flow__node{
+  background: red !important;
+  color: white !important;
 }
