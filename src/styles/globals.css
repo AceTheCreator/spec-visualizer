@@ -1,4 +1,23 @@
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap');
+
+body{
+  font-family: 'Lato', sans-serif;
+}
+
+.body-wrapper{
+  display: flex;
+}
+
 .react-flow__node{
   background: rgba(27, 17, 48, 1) !important;
   color: white !important;
+}
+
+.side-bar{
+  width: 40%;
+  border-left: 1px solid rgb(209, 209, 209);
+  padding: 5px;
+}
+.side-bar > h1{
+  font-weight: bold;
 }

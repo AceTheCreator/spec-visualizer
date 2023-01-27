@@ -1,19 +1,15 @@
+import Sidebar from "@/components/Navigation/Sidebar";
+import { useState } from "react";
 import Nodes from "../components/Nodes/Nodes";
-// const useCenteredTree = (defaultTranslate = { x: 0, y: 0 }) => {
-//   const [translate, setTranslate] = useState(defaultTranslate);
-//   const [dimensions, setDimensions] = useState();
-//   const containerRef = useCallback((containerElem) => {
-//     if (containerElem !== null) {
-//       const { width, height } = containerElem.getBoundingClientRect();
-//       setDimensions({ width, height });
-//       setTranslate({ x: width / 2, y: height / 2 });
-//     }
-//   }, []);
-//   return [dimensions, translate, containerRef];
-// };
 
 export default function Home() {
+  const [currentNode, setCurrentNode] = useState({})
   return (
-    <Nodes />
+    <div>
+      <div className="body-wrapper">
+        <Nodes setCurrentNode={setCurrentNode}  />
+        <Sidebar node={currentNode} />
+      </div>
+    </div>
   );
 }

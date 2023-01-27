@@ -73,7 +73,7 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
   initialEdges
 );
 
-const Nodes = (props: any) => {
+const Nodes = ({setCurrentNode}) => {
   const reactFlowWrapper = useRef(null);
   const { setCenter } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(layoutedNodes);
@@ -126,6 +126,7 @@ const Nodes = (props: any) => {
             },
             sourcePosition: "right",
             targetPosition: "left",
+            draggable: false
           };
         }),
       ];
@@ -157,7 +158,7 @@ const Nodes = (props: any) => {
     }
   };
   function handleMouseEnter(e: MouseEvent, data: Node){
-    console.log(data);
+    setCurrentNode(data);
 
   }
   const edgeTypes = {
@@ -191,8 +192,8 @@ const Nodes = (props: any) => {
 };
 
 // eslint-disable-next-line react/display-name
-export default () => (
+export default ({setCurrentNode}) => (
   <ReactFlowProvider>
-    <Nodes />
+    <Nodes setCurrentNode={setCurrentNode} />
   </ReactFlowProvider>
 );
