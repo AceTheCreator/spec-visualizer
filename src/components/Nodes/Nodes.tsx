@@ -15,6 +15,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import dagre from "dagre";
 import initialNodes from "../../configs/2.5.0.json";
+import removeChildren from "@/utils/removeChildren";
 
 const initialEdges = [
   {
@@ -57,8 +58,8 @@ const getLayoutedElements = (nodes: any, edges: any, direction = "TB") => {
     node.sourcePosition = isHorizontal ? "right" : "bottom";
 
     node.position = {
-      x: nodeWithPosition.x - nodeWidth / 2,
-      y: nodeWithPosition.y - nodeHeight / 2,
+      x: nodeWithPosition.x - nodeWidth / 3,
+      y: nodeWithPosition.y - nodeHeight / 3,
     };
     return node;
   });
@@ -73,7 +74,7 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
 
 const Nodes = (props: any) => {
   const reactFlowWrapper = useRef(null);
-  const { setCenter, reactFlowInstance } = useReactFlow();
+  const { setCenter } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
 
@@ -149,39 +150,11 @@ const Nodes = (props: any) => {
         focusNode(itemChildren[3].position.x, itemChildren[3].position.y, 1.85);
       }
     } else {
-      const newNodes = removeChildren(data.data, nodes)
+      const newNodes = removeChildren(data.data, nodes);
       setNodes([...newNodes]);
       setEdges([...edges.filter((item) => data.id !== item.source)]);
     }
   };
-    var removeByAttr = function (arr, attr, value) {
-      var i = arr.length;
-      while (i--) {
-        if (
-          arr[i] &&
-          arr[i].hasOwnProperty(attr) &&
-          arguments.length > 2 &&
-          arr[i][attr] === value
-        ) {
-          arr.splice(i, 1);
-        }
-      }
-      return arr;
-    };
-  function removeChildren(parentNode: any, nodes: any){
-    let newNodes = nodes
-   const children = parentNode.children;
-   if(children.length > 0){
-    for(let i = 0; i < children.length; i++){
-      newNodes = removeByAttr(nodes, 'id', children[i].id)
-      if(children[i].children.length > 0){
-        console.log('holla')
-        removeChildren(children[i], newNodes)
-      }
-    }
-   }
-   return newNodes
-  }
   const edgeTypes = {
     smart: SmartBezierEdge,
   };
