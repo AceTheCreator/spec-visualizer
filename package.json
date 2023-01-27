@@ -17,6 +17,7 @@
     "dagre": "^0.8.5",
     "eslint": "8.32.0",
     "eslint-config-next": "13.1.2",
+    "markdown-extract": "^1.0.2",
     "next": "13.1.2",
     "node-fetch": "^3.3.0",
     "react": "18.2.0",
