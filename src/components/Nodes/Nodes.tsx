@@ -8,9 +8,10 @@ import ReactFlow, {
   ReactFlowProvider,
   MarkerType,
   useReactFlow,
-  useStoreApi,
-  useNodesInitialized,
   ConnectionLineType,
+  Edge,
+  Node,
+  Connection
 } from "reactflow";
 import "reactflow/dist/style.css";
 import dagre from "dagre";
@@ -75,14 +76,14 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
 const Nodes = (props: any) => {
   const reactFlowWrapper = useRef(null);
   const { setCenter } = useReactFlow();
-  const [nodes, setNodes, onNodesChange] = useNodesState(layoutedNodes);
-  const [edges, setEdges, onEdgesChange] = useEdgesState(layoutedEdges);
+  const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(layoutedNodes);
+  const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(layoutedEdges);
 
   const onConnect = useCallback(
-    (params) =>
+    (connection: Connection) =>
       setEdges((eds) =>
         addEdge(
-          { ...params, type: ConnectionLineType.SmoothStep, animated: true },
+          { ...connection, type: ConnectionLineType.SmoothStep, animated: true },
           eds
         )
       ),
@@ -155,6 +156,10 @@ const Nodes = (props: any) => {
       setEdges([...edges.filter((item) => data.id !== item.source)]);
     }
   };
+  function handleMouseEnter(e: MouseEvent, data: Node){
+    console.log(data);
+
+  }
   const edgeTypes = {
     smart: SmartBezierEdge,
   };
@@ -177,6 +182,7 @@ const Nodes = (props: any) => {
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         onNodeClick={handleNodeClick}
+        onNodeMouseEnter={handleMouseEnter}
         fitView
         defaultViewport={{ x: 1, y: 1, zoom: 0.5 }}
       />
