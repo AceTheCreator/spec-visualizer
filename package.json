@@ -17,9 +17,7 @@
     "dagre": "^0.8.5",
     "eslint": "8.32.0",
     "eslint-config-next": "13.1.2",
-    "markdown-extract": "^1.0.2",
-    "md-2-json": "^2.0.0",
-    "mdast-util-from-markdown": "^1.2.1",
+    "marked": "^4.2.12",
     "next": "13.1.2",
     "node-fetch": "^3.3.0",
     "react": "18.2.0",
@@ -28,5 +26,8 @@
     "reactflow": "^11.4.2",
     "tsx": "^3.12.2",
     "typescript": "4.9.4"
+  },
+  "devDependencies": {
+    "@types/marked": "^4.0.8"
   }
 }
