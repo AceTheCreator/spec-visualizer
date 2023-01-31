@@ -1,6 +1,9 @@
 import fs, { writeFileSync, existsSync } from "fs";
 import path, { resolve } from "path";
 import fetch from "node-fetch";
+// import mdExtract from "markdown-extract";
+import md2json from "md-2-json";
+import { fromMarkdown } from "mdast-util-from-markdown";
 
 async function createDir(name: string){
   if(!existsSync(`src/data/${name}`)){
@@ -28,6 +31,21 @@ export default async function buildSpecs() {
         "Content-Type": "application/json",
       },
     });
+    
+    const mdPath: string = 'src/data/specification/v2.5.0.md';
+    const mdContent: any = fs.readFileSync(mdPath, "utf-8");
+
+    const result = md2json.parse(mdContent);
+    console.log(result)
+    // const tree = fromMarkdown(mdContent);
+    // console.log(tree.children[7]);
+    // //  const testMd = mdExtract(
+    //    "",
+    //    { gfm: false },
+    //    mdContent
+    //  ).join("\n");
+
+    //  console.log(testMd)
 
     const spec: any = await res.json();
     const properties = spec.properties;
@@ -41,7 +59,6 @@ export default async function buildSpecs() {
       const filePath = "src/data/2.5.0/asyncapi.json";
        const fileContent: any = fs.readFileSync(filePath, "utf-8");
        const data = JSON.parse(fileContent);
-       console.log(data)
     }
 
     if(definitions){

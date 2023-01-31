@@ -109,7 +109,6 @@ function createInitalTree() {
   for (const key in data) {
     if (data[key].type === "array" && data[key].items) {
       const items = data[key].items;
-      console.log(Object.values(items));
       data[key][Object.keys(items)[0]] = Object.values(items)[0];
       delete data[key].items;
     }

@@ -1,7 +1,6 @@
 import React from 'react'
 
 function Sidebar({node}) {
-    console.log(node)
   return (
     <div className="side-bar">
       <h1>AsyncAPI Map</h1>
