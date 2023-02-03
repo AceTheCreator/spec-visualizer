@@ -36,50 +36,51 @@ function createSubTrees(parent: any, childPath: string) {
       parent.additionalProperties.oneOf || parent.additionalProperties.anyOf;
     const additionalProperty = parent.additionalProperties["$ref"];
     if (additionalProperties) {
-      const newProperties: any = {};
+      const newProps: any = {};
       for (let i = 0; i < additionalProperties.length; i++) {
         const newRef = additionalProperties[i]["$ref"].split("/").slice(-1)[0];
-        const filePath = `src/data/2.5.0/${newRef}`;
-        const fileContent: any = fs.readFileSync(filePath, "utf-8");
-        const data = JSON.parse(fileContent);
-        const properties = data.properties;
-        for (const prop in properties) {
-          if (properties[prop].type === "array" && properties[prop].items) {
-            const items = properties[prop].items;
-            properties[prop][Object.keys(items)[0]] = Object.values(items)[0];
-            const ref = properties[prop]["$ref"];
-            if (ref) {
-              const newRef = ref
-                .split("/")
-                .slice(-1)[0];
-              const filePath = `src/data/2.5.0/${newRef}`;
-              const fileContent: any = fs.readFileSync(filePath, "utf-8");
-              const data = JSON.parse(fileContent);
-              properties[prop].properties = data.properties || data.additionalProperties;
-            }
-
-            delete properties[prop].items;
-          }
-          newProperties[prop] = properties[prop];
-        }
-      }
+        const title = newRef.split(".")[0];
+        newProps[title] = additionalProperties[i];
+      //   const filePath = `src/data/2.5.0/${newRef}`;
+      //   const fileContent: any = fs.readFileSync(filePath, "utf-8");
+      //   const data = JSON.parse(fileContent);
+      //   const properties = data.properties;
+      //   for (const prop in properties) {
+      //     if (properties[prop].type === "array" && properties[prop].items) {
+      //       const items = properties[prop].items;
+      //       properties[prop][Object.keys(items)[0]] = Object.values(items)[0];
+      //       const ref = properties[prop]["$ref"];
+      //       if (ref) {
+      //       const newRef = ref
+      //           .split("/")
+      //           .slice(-1)[0];
+      //       const filePath = `src/data/2.5.0/${newRef}`;
+      //       const fileContent: any = fs.readFileSync(filePath, "utf-8");
+      //       const data = JSON.parse(fileContent);
+      //       properties[prop].properties = data.properties || data.additionalProperties;
+      //     }
+      //     delete properties[prop].items;
+      //   }
+      //   console.log(newProps[title]);
+      // }
+    }
       parent = {
         ...parent,
-        properties: newProperties,
+        properties: newProps,
       };
       props = parent.properties;
     }
-    if (additionalProperty) {
-      const newRef = additionalProperty.split("/").slice(-1)[0];
-      const filePath = `src/data/2.5.0/${newRef}`;
-      const fileContent: any = fs.readFileSync(filePath, "utf-8");
-      const data = JSON.parse(fileContent);
-      parent = {
-        ...parent,
-        properties: data.properties,
-      };
-      props = parent.properties;
-    }
+    // if (additionalProperty) {
+    //   const newRef = additionalProperty.split("/").slice(-1)[0];
+    //   const filePath = `src/data/2.5.0/${newRef}`;
+    //   const fileContent: any = fs.readFileSync(filePath, "utf-8");
+    //   const data = JSON.parse(fileContent);
+    //   parent = {
+    //     ...parent,
+    //     properties: data.properties,
+    //   };
+    //   props = parent.properties;
+    // }
   }
   if (parent.children) {
     createChildren();
@@ -138,6 +139,9 @@ function getObject(theObject: any, key: string) {
           const newRef = theObject[prop].split("/").slice(-1)[0];
           theObject[prop] = `src/data/2.5.0/${newRef}`;
           createSubTrees(theObject, theObject[prop]);
+        }
+        if (key === "additionalProperties") {
+          createSubTrees(theObject, theObject[prop]["$ref"]);
         }
         if (theObject[prop] == 1) {
           return theObject;
