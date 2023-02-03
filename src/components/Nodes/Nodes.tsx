@@ -16,7 +16,7 @@ import ReactFlow, {
 import "reactflow/dist/style.css";
 import dagre from "dagre";
 import initialNodes from "../../configs/2.5.0.json";
-import removeChildren from "@/utils/removeChildren";
+import {removeChildren} from "@/utils/simpleReuse";
 
 const initialEdges = [
   {

@@ -9,7 +9,6 @@ async function createDir(name: string){
         if (err) {
           return console.error(err);
         }
-        console.log("Directory created successfully!");
       });
   }
 }
@@ -29,21 +28,6 @@ export default async function buildSpecs() {
         "Content-Type": "application/json",
       },
     });
-    
-    const mdPath: string = 'src/data/specification/v2.5.0.md';
-    const mdContent: any = fs.readFileSync(mdPath, "utf-8");
-
-    const result = parse(mdContent);
-    console.log(result)
-    // const tree = fromMarkdown(mdContent);
-    // console.log(tree.children[7]);
-    // //  const testMd = mdExtract(
-    //    "",
-    //    { gfm: false },
-    //    mdContent
-    //  ).join("\n");
-
-    //  console.log(testMd)
 
     const spec: any = await res.json();
     const properties = spec.properties;
@@ -53,14 +37,19 @@ export default async function buildSpecs() {
       // create spec directory
       await createDir(specVersion)
       await createFile(specVersion, 'asyncapi.json', JSON.stringify(properties));
-      // Create default spec config json
-      const filePath = "src/data/2.5.0/asyncapi.json";
-       const fileContent: any = fs.readFileSync(filePath, "utf-8");
-       const data = JSON.parse(fileContent);
     }
 
     if(definitions){
       // write all definations to spec directory
+          const mdPath: string = "src/data/specification/v2.5.0.md";
+          const mdContent: any = fs.readFileSync(mdPath, "utf-8");
+
+          const result = parse(mdContent);
+          // console.log(
+          //   result["AsyncAPI Specification"]["Specification"]["Schema"][
+          //     "Server Object"
+          //   ]
+          // );
       for (const definition in definitions) {
         const title = definition.split("/").slice(-1)[0];
         const scope = definitions[definition];
