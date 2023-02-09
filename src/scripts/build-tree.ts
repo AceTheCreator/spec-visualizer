@@ -41,66 +41,45 @@ function createSubTrees(parent: any, childPath: string) {
         const newRef = additionalProperties[i]["$ref"].split("/").slice(-1)[0];
         const title = newRef.split(".")[0];
         newProps[title] = additionalProperties[i];
-      //   const filePath = `src/data/2.5.0/${newRef}`;
-      //   const fileContent: any = fs.readFileSync(filePath, "utf-8");
-      //   const data = JSON.parse(fileContent);
-      //   const properties = data.properties;
-      //   for (const prop in properties) {
-      //     if (properties[prop].type === "array" && properties[prop].items) {
-      //       const items = properties[prop].items;
-      //       properties[prop][Object.keys(items)[0]] = Object.values(items)[0];
-      //       const ref = properties[prop]["$ref"];
-      //       if (ref) {
-      //       const newRef = ref
-      //           .split("/")
-      //           .slice(-1)[0];
-      //       const filePath = `src/data/2.5.0/${newRef}`;
-      //       const fileContent: any = fs.readFileSync(filePath, "utf-8");
-      //       const data = JSON.parse(fileContent);
-      //       properties[prop].properties = data.properties || data.additionalProperties;
-      //     }
-      //     delete properties[prop].items;
-      //   }
-      //   console.log(newProps[title]);
-      // }
-    }
+      }
       parent = {
         ...parent,
         properties: newProps,
       };
       props = parent.properties;
     }
-    // if (additionalProperty) {
-    //   const newRef = additionalProperty.split("/").slice(-1)[0];
-    //   const filePath = `src/data/2.5.0/${newRef}`;
-    //   const fileContent: any = fs.readFileSync(filePath, "utf-8");
-    //   const data = JSON.parse(fileContent);
-    //   parent = {
-    //     ...parent,
-    //     properties: data.properties,
-    //   };
-    //   props = parent.properties;
-    // }
-  }
-  if (parent.children) {
-    createChildren();
-  } else {
-    parent["children"] = [parent.properties] || [];
-    createChildren();
-  }
-  delete parent["$ref"];
-  delete parent.properties;
-  function createChildren() {
-    for (const prop in props) {
-      parent.children.push({
-        ...props[prop],
-        parent: parent.id,
-        name: prop,
-        id: String(parseInt(Math.random(100000000) * 1000000)),
-        children: [],
-      });
+    if (additionalProperty) {
+      const newRef = additionalProperty.split("/").slice(-1)[0];
+      const filePath = `src/data/2.5.0/${newRef}`;
+      const fileContent: any = fs.readFileSync(filePath, "utf-8");
+      const data = JSON.parse(fileContent);
+      parent = {
+        ...parent,
+        properties: data.properties,
+      };
+      props = parent.properties;
     }
   }
+
+  createChildren(parent, props);
+
+  delete parent["$ref"];
+}
+
+function createChildren(parent, props) {
+  if (!parent.children) {
+    parent["children"] = [parent.properties] || [];
+  }
+  for (const prop in props) {
+    parent.children.push({
+      ...props[prop],
+      parent: parent.id,
+      name: prop,
+      id: String(parseInt(Math.random(100000000) * 1000000)),
+      children: [],
+    });
+  }
+  delete parent.properties;
 }
 
 function createInitalTree() {
@@ -140,6 +119,12 @@ function getObject(theObject: any, key: string) {
           theObject[prop] = `src/data/2.5.0/${newRef}`;
           createSubTrees(theObject, theObject[prop]);
         }
+        // if (key === "patternProperties") {
+        //   console.log('hola')
+        //   const obj = theObject[prop];
+        //   createSubTrees(theObject, obj[Object.keys(obj)[0]]);
+        //   // console.log(theObject)
+        // }
         if (key === "additionalProperties") {
           createSubTrees(theObject, theObject[prop]["$ref"]);
         }
@@ -165,6 +150,7 @@ export default async function buildTree() {
   createInitalTree();
   getObject(res, "$ref");
   getObject(res, "additionalProperties");
+  getObject(res, "patternProperties");
 
   await walkDirectories(specDirectories);
   writeFileSync(

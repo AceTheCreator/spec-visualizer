@@ -41,10 +41,10 @@ export default async function buildSpecs() {
 
     if(definitions){
       // write all definations to spec directory
-          const mdPath: string = "src/data/specification/v2.5.0.md";
-          const mdContent: any = fs.readFileSync(mdPath, "utf-8");
+          // const mdPath: string = "src/data/specification/v2.5.0.md";
+          // const mdContent: any = fs.readFileSync(mdPath, "utf-8");
 
-          const result = parse(mdContent);
+          // const result = parse(mdContent);
           // console.log(
           //   result["AsyncAPI Specification"]["Specification"]["Schema"][
           //     "Server Object"
