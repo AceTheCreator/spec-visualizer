@@ -23,7 +23,7 @@ async function walkDirectories(directories: string[]) {
   }
 }
 
-function createSubTrees(parent: any, childPath: string) {
+function childFromPath(parent: any, childPath: string) {
   const fileContent: any = fs.readFileSync(childPath, "utf-8");
   const data = JSON.parse(fileContent);
   parent = {
@@ -31,7 +31,7 @@ function createSubTrees(parent: any, childPath: string) {
     ...data,
   };
   let props = parent.properties;
-  if (parent.additionalProperties) {
+  if (parent.additionalProperties && !props) {
     const additionalProperties =
       parent.additionalProperties.oneOf || parent.additionalProperties.anyOf;
     const additionalProperty = parent.additionalProperties["$ref"];
@@ -59,6 +59,13 @@ function createSubTrees(parent: any, childPath: string) {
       };
       props = parent.properties;
     }
+    if(!additionalProperties && !additionalProperty){
+      parent = {
+        ...parent,
+        properties: parent.additionalProperties.items
+      }
+      props = parent.properties;
+    }
   }
 
   createChildren(parent, props);
@@ -71,6 +78,10 @@ function createChildren(parent, props) {
     parent["children"] = [parent.properties] || [];
   }
   for (const prop in props) {
+    if(props[prop].type === "array" && props[prop].items){
+      const items = props[prop].items;
+      props[prop][Object.keys(items)[0]] = Object.values(items)[0];
+    }
     parent.children.push({
       ...props[prop],
       parent: parent.id,
@@ -117,16 +128,10 @@ function getObject(theObject: any, key: string) {
         if (key === "$ref") {
           const newRef = theObject[prop].split("/").slice(-1)[0];
           theObject[prop] = `src/data/2.5.0/${newRef}`;
-          createSubTrees(theObject, theObject[prop]);
+          childFromPath(theObject, theObject[prop]);
         }
-        // if (key === "patternProperties") {
-        //   console.log('hola')
-        //   const obj = theObject[prop];
-        //   createSubTrees(theObject, obj[Object.keys(obj)[0]]);
-        //   // console.log(theObject)
-        // }
         if (key === "additionalProperties") {
-          createSubTrees(theObject, theObject[prop]["$ref"]);
+          childFromPath(theObject, theObject[prop]["$ref"]);
         }
         if (theObject[prop] == 1) {
           return theObject;
@@ -150,7 +155,6 @@ export default async function buildTree() {
   createInitalTree();
   getObject(res, "$ref");
   getObject(res, "additionalProperties");
-  getObject(res, "patternProperties");
 
   await walkDirectories(specDirectories);
   writeFileSync(
