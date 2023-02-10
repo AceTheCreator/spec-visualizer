@@ -141,7 +141,6 @@ function getObject(theObject: any, key: string) {
     for (var prop in theObject) {
       if (prop == key) {
         if (key === "$ref") {
-          console.log(theObject);
           const newRef = theObject[prop].split("/").slice(-1)[0];
           theObject[prop] = `src/data/2.5.0/${newRef}`;
           childFromPath(theObject, theObject[prop]);
