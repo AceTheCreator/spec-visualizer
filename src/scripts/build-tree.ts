@@ -12,30 +12,33 @@ const res: any = [
 const basePath = "src";
 const specDirectories = [`${basePath}/data/2.5.0`];
 
-async function walkDirectories(directories: string[]) {
-  for (let dir of directories) {
-    let files = readdirSync(dir);
-    for (let file of files) {
-      const filePath = [dir, file].join("/");
-      const fileContent: any = fs.readFileSync(filePath, "utf-8");
-      const data = JSON.parse(fileContent);
-    }
-  }
-}
+// async function walkDirectories(directories: string[]) {
+//   for (let dir of directories) {
+//     let files = readdirSync(dir);
+//     for (let file of files) {
+//       const filePath = [dir, file].join("/");
+//       const fileContent: any = fs.readFileSync(filePath, "utf-8");
+//       const data = JSON.parse(fileContent);
+//     }
+//   }
+// }
 
 function childFromPath(parent: any, childPath: string) {
-  const fileContent: any = fs.readFileSync(childPath, "utf-8");
-  const data = JSON.parse(fileContent);
-  parent = {
-    ...parent,
-    ...data,
-  };
+  if(childPath){
+          const fileContent: any = fs.readFileSync(childPath, "utf-8");
+          const data = JSON.parse(fileContent);
+          parent = {
+            ...parent,
+            ...data,
+          };
+  }
   let props = parent.properties;
   if (parent.additionalProperties && !props) {
-    const additionalProperties =
+    const additionalProperties = 
       parent.additionalProperties.oneOf || parent.additionalProperties.anyOf;
     const additionalProperty = parent.additionalProperties["$ref"];
-    if (additionalProperties) {
+    if (additionalProperties) {    
+      // console.log(parent.additionalProperties.oneOf);
       const newProps: any = {};
       for (let i = 0; i < additionalProperties.length; i++) {
         const newRef = additionalProperties[i]["$ref"].split("/").slice(-1)[0];
@@ -53,6 +56,7 @@ function childFromPath(parent: any, childPath: string) {
       const filePath = `src/data/2.5.0/${newRef}`;
       const fileContent: any = fs.readFileSync(filePath, "utf-8");
       const data = JSON.parse(fileContent);
+      // Build schema for missing properties
       parent = {
         ...parent,
         properties: data.properties,
@@ -73,6 +77,10 @@ function childFromPath(parent: any, childPath: string) {
   delete parent["$ref"];
 }
 
+function writeSchemaForMissingProperties(parent, object){
+
+}
+
 function createChildren(parent, props) {
   if (!parent.children) {
     parent["children"] = [parent.properties] || [];
@@ -80,7 +88,16 @@ function createChildren(parent, props) {
   for (const prop in props) {
     if(props[prop].type === "array" && props[prop].items){
       const items = props[prop].items;
-      props[prop][Object.keys(items)[0]] = Object.values(items)[0];
+      if (typeof Object.values(items)[0] === 'string') {
+        props[prop][Object.keys(items)[0]] = Object.values(items)[0];
+      }else{
+        // testing structure for complex item properties
+        const items = props[prop].items;
+        items.oneOf.pop()
+        const newItems = items;
+        props[prop].additionalProperties = props[prop].items
+        // console.log(props[prop].additionalProperties);
+      }
     }
     parent.children.push({
       ...props[prop],
@@ -126,12 +143,13 @@ function getObject(theObject: any, key: string) {
     for (var prop in theObject) {
       if (prop == key) {
         if (key === "$ref") {
+          console.log(theObject)
           const newRef = theObject[prop].split("/").slice(-1)[0];
           theObject[prop] = `src/data/2.5.0/${newRef}`;
           childFromPath(theObject, theObject[prop]);
         }
         if (key === "additionalProperties") {
-          childFromPath(theObject, theObject[prop]["$ref"]);
+           childFromPath(theObject, theObject[prop]["$ref"]);
         }
         if (theObject[prop] == 1) {
           return theObject;
@@ -156,7 +174,7 @@ export default async function buildTree() {
   getObject(res, "$ref");
   getObject(res, "additionalProperties");
 
-  await walkDirectories(specDirectories);
+  // await walkDirectories(specDirectories);
   writeFileSync(
     resolve(__dirname, `../configs`, "2.5.0.json"),
     JSON.stringify(res)
