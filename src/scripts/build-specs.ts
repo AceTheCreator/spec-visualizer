@@ -36,20 +36,10 @@ export default async function buildSpecs() {
     if(properties){
       // create spec directory
       await createDir(specVersion)
-      await createFile(specVersion, 'asyncapi.json', JSON.stringify(properties));
+      await createFile(specVersion, 'asyncapi.json', JSON.stringify(spec));
     }
 
     if(definitions){
-      // write all definations to spec directory
-          // const mdPath: string = "src/data/specification/v2.5.0.md";
-          // const mdContent: any = fs.readFileSync(mdPath, "utf-8");
-
-          // const result = parse(mdContent);
-          // console.log(
-          //   result["AsyncAPI Specification"]["Specification"]["Schema"][
-          //     "Server Object"
-          //   ]
-          // );
       for (const definition in definitions) {
         const title = definition.split("/").slice(-1)[0];
         const scope = definitions[definition];

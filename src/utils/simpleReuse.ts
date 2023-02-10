@@ -27,11 +27,11 @@ export function removeChildren(parentNode: any, nodes: any) {
   return newNodes;
 }
 
-export function getObject(theObject: any, key: string) {
+export function retrieveObj(theObject: any, key: string) {
   var result = null;
   if (theObject instanceof Array) {
     for (var i = 0; i < theObject.length; i++) {
-      result = getObject(theObject[i], key);
+      result = retrieveObj(theObject[i], key);
       if (result) {
         break;
       }
@@ -39,15 +39,13 @@ export function getObject(theObject: any, key: string) {
   } else {
     for (var prop in theObject) {
       if (prop == key) {
-        if (theObject[prop] == 1) {
-          return theObject;
-        }
+        return theObject[prop]
       }
       if (
         theObject[prop] instanceof Object ||
         theObject[prop] instanceof Array
       ) {
-        result = getObject(theObject[prop], key);
+        result = retrieveObj(theObject[prop], key);
         if (result) {
           break;
         }

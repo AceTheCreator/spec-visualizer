@@ -1,132 +1,99 @@
+import { retrieveObj } from "@/utils/simpleReuse";
 import fs, { writeFileSync, existsSync, readdirSync } from "fs";
 import path, { resolve } from "path";
+import asyncapi from "../data/2.5.0/asyncapi.json";
 
-const res: any = [
+type TreeInterface = {
+  id: number;
+  name: string;
+  parent: number;
+  description: string;
+  children: Array<TreeInterface>;
+};
+
+const tree: Array<TreeInterface> = [
   {
-    id: "1",
-    name: "asyncapi doc",
+    id: 1,
     children: [],
   },
 ];
 
-const basePath = "src";
-const specDirectories = [`${basePath}/data/2.5.0`];
-
-// async function walkDirectories(directories: string[]) {
-//   for (let dir of directories) {
-//     let files = readdirSync(dir);
-//     for (let file of files) {
-//       const filePath = [dir, file].join("/");
-//       const fileContent: any = fs.readFileSync(filePath, "utf-8");
-//       const data = JSON.parse(fileContent);
-//     }
-//   }
-// }
-
-function childFromPath(parent: any, childPath: string) {
-  if(childPath){
-          const fileContent: any = fs.readFileSync(childPath, "utf-8");
-          const data = JSON.parse(fileContent);
-          parent = {
-            ...parent,
-            ...data,
-          };
-  }
-  let props = parent.properties;
-  if (parent.additionalProperties && !props) {
-    const additionalProperties = 
-      parent.additionalProperties.oneOf || parent.additionalProperties.anyOf;
-    const additionalProperty = parent.additionalProperties["$ref"];
-    if (additionalProperties) {    
-      // console.log(parent.additionalProperties.oneOf);
-      const newProps: any = {};
-      for (let i = 0; i < additionalProperties.length; i++) {
-        const newRef = additionalProperties[i]["$ref"].split("/").slice(-1)[0];
-        const title = newRef.split(".")[0];
-        newProps[title] = additionalProperties[i];
-      }
-      parent = {
-        ...parent,
-        properties: newProps,
-      };
-      props = parent.properties;
-    }
-    if (additionalProperty) {
-      const newRef = additionalProperty.split("/").slice(-1)[0];
-      const filePath = `src/data/2.5.0/${newRef}`;
-      const fileContent: any = fs.readFileSync(filePath, "utf-8");
-      const data = JSON.parse(fileContent);
-      // Build schema for missing properties
-      parent = {
-        ...parent,
-        properties: data.properties,
-      };
-      props = parent.properties;
-    }
-    if(!additionalProperties && !additionalProperty){
-      parent = {
-        ...parent,
-        properties: parent.additionalProperties.items
-      }
-      props = parent.properties;
-    }
-  }
-
-  createChildren(parent, props);
-
-  delete parent["$ref"];
+function buildChildrenFromRef(parent, key) {
+  const data = retrieveObj(asyncapi, key);
+  parent = {
+    ...parent,
+    ...data,
+  };
+  console.log(parent)
+    const properties = buildProperties(parent, parent.id);
+    // console.log(properties);
+  // buildRoot(parent, parent.id, "children");
 }
 
-function writeSchemaForMissingProperties(parent, object){
-
+function buildProperties(object: any, parent: number) {
+  const newProperty: any = {};
+  if (object.properties) {
+    const obj = object.properties;
+    for (const property in obj) {
+      newProperty[property] = obj[property];
+      newProperty[property].parent = parent;
+      newProperty[property].name = property;
+      newProperty[property].id = String(
+        parseInt(Math.random(100000000) * 1000000)
+      );
+      newProperty[property].children = [];
+    }
+  }
+  if (object.patternProperties) {
+    const obj = object.patternProperties;
+    for (const property in obj) {
+      newProperty[property] = obj[property];
+      newProperty[property].parent = parent;
+      newProperty[property].name = property;
+      newProperty[property].id = String(
+        parseInt(Math.random(100000000) * 1000000)
+      );
+      newProperty[property].children = [];
+    }
+  }
+  if (object.additionalProperties) {
+    const obj = object.additionalProperties;
+    for (const property in obj) {
+      newProperty[property] = obj[property];
+      newProperty[property].parent = parent;
+      newProperty[property].name = property;
+      newProperty[property].id = String(
+        parseInt(Math.random(100000000) * 1000000)
+      );
+      newProperty[property].children = [];
+    }
+  }
+  return newProperty;
 }
 
-function createChildren(parent, props) {
-  if (!parent.children) {
-    parent["children"] = [parent.properties] || [];
-  }
-  for (const prop in props) {
-    if(props[prop].type === "array" && props[prop].items){
-      const items = props[prop].items;
-      if (typeof Object.values(items)[0] === 'string') {
-        props[prop][Object.keys(items)[0]] = Object.values(items)[0];
-      }else{
-        // testing structure for complex item properties
-        const items = props[prop].items;
-        items.oneOf.pop()
-        const newItems = items;
-        props[prop].additionalProperties = props[prop].items
-        // console.log(props[prop].additionalProperties);
+function buildRoot(object, parentId, type) {
+  const properties = buildProperties(asyncapi, parentId);
+  if(type === "initial"){
+      object[0].name = asyncapi.title;
+      for (const property in properties) {
+        object[0].children.push({
+          ...properties[property],
+          parent: parentId,
+          name: property,
+          id: String(parseInt(Math.random(100000000) * 1000000)),
+          children: [],
+        });
       }
-    }
-    parent.children.push({
-      ...props[prop],
-      parent: parent.id,
-      name: prop,
-      id: String(parseInt(Math.random(100000000) * 1000000)),
-      children: [],
-    });
-  }
-  delete parent.properties;
-}
-
-function createInitalTree() {
-  const filePath = "src/data/2.5.0/asyncapi.json";
-  const fileContent: any = fs.readFileSync(filePath, "utf-8");
-  const data = JSON.parse(fileContent);
-  for (const key in data) {
-    if (data[key].type === "array" && data[key].items) {
-      const items = data[key].items;
-      data[key][Object.keys(items)[0]] = Object.values(items)[0];
-      delete data[key].items;
-    }
-    res[0].children.push({
-      ...data[key],
-      parent: res[0].id,
-      name: key,
-      id: String(parseInt(Math.random(100000000) * 1000000)),
-      children: [],
-    });
+  }else{
+      for (const property in properties) {
+        object.children.push({
+          ...properties[property],
+          parent: parentId,
+          name: property,
+          id: String(parseInt(Math.random(100000000) * 1000000)),
+          children: [],
+        });
+      }
   }
 }
 
@@ -143,13 +110,7 @@ function getObject(theObject: any, key: string) {
     for (var prop in theObject) {
       if (prop == key) {
         if (key === "$ref") {
-          console.log(theObject)
-          const newRef = theObject[prop].split("/").slice(-1)[0];
-          theObject[prop] = `src/data/2.5.0/${newRef}`;
-          childFromPath(theObject, theObject[prop]);
-        }
-        if (key === "additionalProperties") {
-           childFromPath(theObject, theObject[prop]["$ref"]);
+          buildChildrenFromRef(theObject, theObject[prop] )
         }
         if (theObject[prop] == 1) {
           return theObject;
@@ -170,13 +131,10 @@ function getObject(theObject: any, key: string) {
 }
 
 export default async function buildTree() {
-  createInitalTree();
-  getObject(res, "$ref");
-  getObject(res, "additionalProperties");
-
-  // await walkDirectories(specDirectories);
+  buildRoot(tree, 1, "initial");
+  getObject(tree, "$ref");
   writeFileSync(
     resolve(__dirname, `../configs`, "2.5.0.json"),
-    JSON.stringify(res)
+    JSON.stringify(tree)
   );
 }
