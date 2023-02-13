@@ -25,25 +25,7 @@ function buildChildrenFromRef(parent, key) {
     ...data,
   };
   const properties = buildProperties(parent, parent.id);
-  // console.log(properties);
-  // console.log(parent);
-  //   if(parent.additionalProperties)
-  // {
-  //   console.log('herllo');
-  // }else{
-  //   // console.log(parent);
-  //   // const properties = buildProperties(parent, parent.id);
-  //         // for (const property in properties) {
-  //         //   parent.children.push({
-  //         //     ...properties[property],
-  //         //     parent: parent.id,
-  //         //     name: property,
-  //         //     id: String(parseInt(Math.random(100000000) * 1000000)),
-  //         //     children: [],
-  //         //   });
-  //         // }
-  // }    // const properties = buildProperties(parent, parent.id);
-  //  console.log(parent);
+
   buildRoot(parent, parent.id, "children", properties);
 }
 
@@ -61,6 +43,25 @@ function buildProperties(object: any, parent: number) {
       newProperty[property].children = [];
     }
   }
+  // if(object.allOf){
+  //   const obj = object
+  //   const arrayProps = obj.allOf
+  //   if (arrayProps) {
+  //     for (let i = 0; i < arrayProps.length; i++) {
+  //       const newRef = arrayProps[i]["$ref"].split("/").slice(-1)[0];
+  //       let title = newRef.split(".")[0];
+  //       if(title){
+  //          newProperty[title] = arrayProps[i];
+  //       }else{
+  //         console.log(arrayProps[i])
+  //       }
+  //     }
+  //   }
+  //   // if (obj.type === "array" && obj.items) {
+  //   //   const items = obj.items;
+  //   //   newProperty[obj[Object.keys(items)[0]]] = Object.values(items)[0];
+  //   // }
+  // }
   if (object.patternProperties) {
     const obj = object.patternProperties;
     for (const property in obj) {
@@ -85,13 +86,39 @@ function buildProperties(object: any, parent: number) {
     }
     if (obj.type === "array" && obj.items) {
       const items = obj.items;
-      // obj[Object.keys(items)[0]] = Object.values(items)[0];
       newProperty[obj[Object.keys(items)[0]]] = Object.values(items)[0];
-      console.log(newProperty)
     } else {
       for (const property in obj) {
         if (typeof obj[property] === "string") {
-          console.log(obj);
+          const data = retrieveObj(asyncapi, obj[property]);
+          object = {
+            ...object,
+            ...data,
+          }
+          delete object.additionalProperties
+          const properties = buildProperties(object, object.id);
+          buildRoot(object, object.id, "children", properties);
+          // if (!object.children) {
+          //   object["children"] = [];
+          // }
+          // for (const property in properties) {
+          //   if (
+          //     properties[property].type === "array" &&
+          //     properties[property].items
+          //   ) {
+          //     const items = properties[property].items;
+          //     properties[property][Object.keys(items)[0]] =
+          //       Object.values(items)[0];
+          //     delete properties[property].items;
+          //   }
+          //   object.children.push({
+          //     ...properties[property],
+          //     parent: object.id,
+          //     name: property,
+          //     id: String(parseInt(Math.random(100000000) * 1000000)),
+          //     children: [],
+          //   });
+          // }
         } else {
           newProperty[property] = obj[property];
           newProperty[property].parent = parent;
@@ -102,6 +129,9 @@ function buildProperties(object: any, parent: number) {
           newProperty[property].children = [];
         }
       }
+    }
+    if (newProperty.oneOf) {
+      delete newProperty.oneOf;
     }
   }
   return newProperty;

@@ -39,7 +39,7 @@ export function retrieveObj(theObject: any, key: string) {
   } else {
     for (var prop in theObject) {
       if (prop == key) {
-        return theObject[prop]
+        return theObject[prop];
       }
       if (
         theObject[prop] instanceof Object ||
