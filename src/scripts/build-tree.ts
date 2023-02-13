@@ -95,30 +95,12 @@ function buildProperties(object: any, parent: number) {
             ...object,
             ...data,
           }
-          delete object.additionalProperties
+          console.log(object)
+          if (obj[property] === object["$id"]){
+            delete object.additionalProperties;
+          }
           const properties = buildProperties(object, object.id);
           buildRoot(object, object.id, "children", properties);
-          // if (!object.children) {
-          //   object["children"] = [];
-          // }
-          // for (const property in properties) {
-          //   if (
-          //     properties[property].type === "array" &&
-          //     properties[property].items
-          //   ) {
-          //     const items = properties[property].items;
-          //     properties[property][Object.keys(items)[0]] =
-          //       Object.values(items)[0];
-          //     delete properties[property].items;
-          //   }
-          //   object.children.push({
-          //     ...properties[property],
-          //     parent: object.id,
-          //     name: property,
-          //     id: String(parseInt(Math.random(100000000) * 1000000)),
-          //     children: [],
-          //   });
-          // }
         } else {
           newProperty[property] = obj[property];
           newProperty[property].parent = parent;
