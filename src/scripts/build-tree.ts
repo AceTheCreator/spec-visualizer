@@ -42,26 +42,8 @@ function buildProperties(object: any, parent: number) {
       );
       newProperty[property].children = [];
     }
+    delete object.properties
   }
-  // if(object.allOf){
-  //   const obj = object
-  //   const arrayProps = obj.allOf
-  //   if (arrayProps) {
-  //     for (let i = 0; i < arrayProps.length; i++) {
-  //       const newRef = arrayProps[i]["$ref"].split("/").slice(-1)[0];
-  //       let title = newRef.split(".")[0];
-  //       if(title){
-  //          newProperty[title] = arrayProps[i];
-  //       }else{
-  //         console.log(arrayProps[i])
-  //       }
-  //     }
-  //   }
-  //   // if (obj.type === "array" && obj.items) {
-  //   //   const items = obj.items;
-  //   //   newProperty[obj[Object.keys(items)[0]]] = Object.values(items)[0];
-  //   // }
-  // }
   if (object.patternProperties) {
     const obj = object.patternProperties;
     for (const property in obj) {
@@ -73,6 +55,7 @@ function buildProperties(object: any, parent: number) {
       );
       newProperty[property].children = [];
     }
+    delete object.patternProperties;
   }
   if (object.additionalProperties && object.additionalProperties !== true) {
     const obj = object.additionalProperties;
@@ -95,7 +78,6 @@ function buildProperties(object: any, parent: number) {
             ...object,
             ...data,
           }
-          console.log(object)
           if (obj[property] === object["$id"]){
             delete object.additionalProperties;
           }
@@ -115,7 +97,11 @@ function buildProperties(object: any, parent: number) {
     if (newProperty.oneOf) {
       delete newProperty.oneOf;
     }
+    delete object.additionalProperties
   }
+  // if(!object.properties && !object.patternProperties && object.additionalProperties === true){
+  //   console.log(object)
+  // }
   return newProperty;
 }
 
@@ -173,6 +159,9 @@ function getObject(theObject: any, key: string) {
         if (key === "$ref") {
           buildChildrenFromRef(theObject, theObject[prop]);
         }
+        if(key === "additionalProperties"){
+          buildChildrenFromRef(theObject, theObject[prop]);
+        }
         if (theObject[prop] == 1) {
           return theObject;
         }
@@ -194,6 +183,8 @@ function getObject(theObject: any, key: string) {
 export default async function buildTree() {
   buildRoot(tree, 1, "initial");
   getObject(tree, "$ref");
+  getObject(tree, "additionalProperties");
+  //  getObject(tree, "$ref");
   writeFileSync(
     resolve(__dirname, `../configs`, "2.5.0.json"),
     JSON.stringify(tree)
