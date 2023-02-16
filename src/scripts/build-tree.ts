@@ -41,11 +41,26 @@ function buildProperties(object: any, parent: number) {
         parseInt(Math.random(100000000) * 1000000)
       );
       newProperty[property].children = [];
+      if (obj[property].patternProperties) {
+        const patterns = obj[property];
+        const props = buildProperties(patterns, patterns.id);
+        buildRoot(patterns, patterns.id, "children", props);
+        newProperty[property] = patterns;
+      }
     }
-    delete object.properties
+    delete object.properties;
   }
   if (object.patternProperties) {
     const obj = object.patternProperties;
+    if (obj[Object.keys(obj)[0]] && obj[Object.keys(obj)[0]].oneOf) {
+      const arrayProps = obj[Object.keys(obj)[0]].oneOf;
+      for (let i = 0; i < arrayProps.length; i++) {
+        const newRef = arrayProps[i]["$ref"].split("/").slice(-1)[0];
+        const title = newRef.split(".")[0];
+        newProperty[title] = arrayProps[i];
+      }
+      delete obj[Object.keys(obj)[0]];
+    }
     for (const property in obj) {
       newProperty[property] = obj[property];
       newProperty[property].parent = parent;
@@ -77,8 +92,8 @@ function buildProperties(object: any, parent: number) {
           object = {
             ...object,
             ...data,
-          }
-          if (obj[property] === object["$id"]){
+          };
+          if (obj[property] === object["$id"]) {
             delete object.additionalProperties;
           }
           const properties = buildProperties(object, object.id);
@@ -97,11 +112,39 @@ function buildProperties(object: any, parent: number) {
     if (newProperty.oneOf) {
       delete newProperty.oneOf;
     }
-    delete object.additionalProperties
+    delete object.additionalProperties;
   }
-  // if(!object.properties && !object.patternProperties && object.additionalProperties === true){
-  //   console.log(object)
-  // }
+  if (
+    !object.properties &&
+    !object.patternProperties &&
+    !object.additionalProperties
+  ) {
+    if (object.anyOf || object.allOf || object.oneOf) {
+      const oneOfProperty = object.allOf;
+      if (oneOfProperty) {
+        for (let i = 0; i < oneOfProperty.length; i++) {
+          if (oneOfProperty[i]["$ref"]) {
+            // const newRef = oneOfProperty[i]["$ref"].split("/").slice(-1)[0];
+            // const title = newRef.split(".")[0];
+            // newProperty[title] = oneOfProperty[i];
+            // newProperty[title].parent = parent;
+            // newProperty[title].name = title;
+            // newProperty[title].id = String(
+            //   parseInt(Math.random(100000000) * 1000000)
+            // );
+            // newProperty[title].children = [];
+            // delete oneOfProperty[i]["$ref"];
+          } else {
+            //  console.log(oneOfProperty[i]);
+            //TODO: Add case for properties that are not $refs
+            const res = oneOfProperty[i];
+            const props = buildProperties(res, parent);
+          }
+        }
+        console.log(object)
+      }
+    }
+  }
   return newProperty;
 }
 
@@ -137,8 +180,10 @@ function buildRoot(object, parentId, type, properties) {
         ...properties[property],
         parent: parentId || object.id,
         name: property,
-        id: String(parseInt(Math.random(100000000) * 1000000)),
-        children: [],
+        id:
+          properties[property].id ||
+          String(parseInt(Math.random(100000000) * 1000000)),
+        children: properties[property].children || [],
       });
     }
   }
@@ -159,9 +204,9 @@ function getObject(theObject: any, key: string) {
         if (key === "$ref") {
           buildChildrenFromRef(theObject, theObject[prop]);
         }
-        if(key === "additionalProperties"){
-          buildChildrenFromRef(theObject, theObject[prop]);
-        }
+        // if (key === "additionalProperties") {
+        //   buildChildrenFromRef(theObject, theObject[prop]);
+        // }
         if (theObject[prop] == 1) {
           return theObject;
         }
@@ -183,7 +228,7 @@ function getObject(theObject: any, key: string) {
 export default async function buildTree() {
   buildRoot(tree, 1, "initial");
   getObject(tree, "$ref");
-  getObject(tree, "additionalProperties");
+  // getObject(tree, "additionalProperties");
   //  getObject(tree, "$ref");
   writeFileSync(
     resolve(__dirname, `../configs`, "2.5.0.json"),
