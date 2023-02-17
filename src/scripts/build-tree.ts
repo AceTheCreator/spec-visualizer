@@ -97,6 +97,9 @@ function buildProperties(object: any, parent: number) {
             delete object.additionalProperties;
           }
           const properties = buildProperties(object, object.id);
+          // if (object.name === "schemas") {
+          //   console.log(properties);
+          // }
           buildRoot(object, object.id, "children", properties);
         } else {
           newProperty[property] = obj[property];
@@ -122,26 +125,48 @@ function buildProperties(object: any, parent: number) {
     if (object.anyOf || object.allOf || object.oneOf) {
       const oneOfProperty = object.allOf;
       if (oneOfProperty) {
-        for (let i = 0; i < oneOfProperty.length; i++) {
-          if (oneOfProperty[i]["$ref"]) {
-            // const newRef = oneOfProperty[i]["$ref"].split("/").slice(-1)[0];
-            // const title = newRef.split(".")[0];
-            // newProperty[title] = oneOfProperty[i];
-            // newProperty[title].parent = parent;
-            // newProperty[title].name = title;
-            // newProperty[title].id = String(
-            //   parseInt(Math.random(100000000) * 1000000)
-            // );
-            // newProperty[title].children = [];
-            // delete oneOfProperty[i]["$ref"];
-          } else {
-            //  console.log(oneOfProperty[i]);
-            //TODO: Add case for properties that are not $refs
-            const res = oneOfProperty[i];
-            const props = buildProperties(res, parent);
+          for (let i = 0; i < oneOfProperty.length; i++) {
+            if (oneOfProperty[i]["$ref"]) {
+              const newRef = oneOfProperty[i]["$ref"].split("/").slice(-1)[0];
+              const title = newRef.split(".")[0];
+              newProperty[title] = oneOfProperty[i];
+              newProperty[title].parent = parent;
+              newProperty[title].name = title;
+              newProperty[title].id = String(
+                parseInt(Math.random(100000000) * 1000000)
+              );
+              newProperty[title].children = [];
+            } else {
+              const children = oneOfProperty[i];
+              const patterns = children.patternProperties;
+              const properties = children.properties;
+              if (patterns) {
+                for (const property in patterns) {
+                  newProperty[property] = patterns[property];
+                  newProperty[property].id = String(
+                    parseInt(Math.random(100000000) * 1000000)
+                  );
+                  newProperty[property].name = property;
+                  newProperty[property].parent = object.id;
+                }
+              }
+              if (properties) {
+                for (const property in properties) {
+                  if(properties[property]["$ref"] === object["$id"]){
+                    delete properties[property]["$ref"];
+                    console.log(object)
+                  }
+                  newProperty[property] = properties[property];
+                  newProperty[property].id = String(
+                    parseInt(Math.random(100000000) * 1000000)
+                  );
+                  newProperty[property].name = property;
+                  newProperty[property].parent = object.id;
+                }
+              }
+            }
           }
-        }
-        console.log(object)
+        delete object.allOf;
       }
     }
   }
@@ -204,9 +229,9 @@ function getObject(theObject: any, key: string) {
         if (key === "$ref") {
           buildChildrenFromRef(theObject, theObject[prop]);
         }
-        // if (key === "additionalProperties") {
-        //   buildChildrenFromRef(theObject, theObject[prop]);
-        // }
+        if (key === "additionalProperties") {
+          buildChildrenFromRef(theObject, theObject[prop]);
+        }
         if (theObject[prop] == 1) {
           return theObject;
         }
