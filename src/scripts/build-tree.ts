@@ -254,7 +254,7 @@ function getObject(theObject: any, key: string) {
 }
 
 export default async function buildTree() {
-  buildRoot(tree, 1, "initial");
+  buildRoot(tree, 1, "initial", null);
   getObject(tree, "$ref");
   getObject(tree, "additionalProperties");
   writeFileSync(
