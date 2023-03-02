@@ -1,7 +1,6 @@
 import fs, { writeFileSync, existsSync } from "fs";
 import path, { resolve } from "path";
 import fetch from "node-fetch";
-import parse from "@/utils/markdown-to-json";
 
 async function createDir(name: string){
   if(!existsSync(`src/data/${name}`)){
