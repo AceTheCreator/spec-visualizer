@@ -72,7 +72,7 @@ function buildProperties(object: any, parent: number) {
     }
     delete object.patternProperties;
   }
-  if (object.additionalProperties && object.additionalProperties !== true) {3
+  if (object.additionalProperties && object.additionalProperties !== true) {
     const obj = object.additionalProperties;
     const arrayProps = obj.oneOf || obj.anyOf;
     if (arrayProps) {
