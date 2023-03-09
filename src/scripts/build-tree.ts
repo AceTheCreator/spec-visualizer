@@ -32,6 +32,9 @@ function buildChildrenFromRef(parent, key) {
 function extractProps(object, newProperty, parent) {
   const obj = object.properties;
   for (const property in obj) {
+    if(obj[property].type === "array" && obj[property].oneOf){
+      extractArrayProps(obj[property], newProperty, parent)
+    }
     newProperty[property] = obj[property];
     newProperty[property].parent = parent;
     newProperty[property].name = property;

@@ -27,7 +27,6 @@ export default async function buildSpecs() {
         "Content-Type": "application/json",
       },
     });
-
     const spec: any = await res.json();
     const properties = spec.properties;
     const definitions = spec.definitions;
