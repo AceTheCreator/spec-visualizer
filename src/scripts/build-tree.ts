@@ -29,89 +29,157 @@ function buildChildrenFromRef(parent, key) {
   buildRoot(parent, parent.id, "children", properties);
 }
 
+function extractProps(object, newProperty, parent) {
+  const obj = object.properties;
+  for (const property in obj) {
+    newProperty[property] = obj[property];
+    newProperty[property].parent = parent;
+    newProperty[property].name = property;
+    newProperty[property].id = String(
+      parseInt(Math.random(100000000) * 1000000)
+    );
+    newProperty[property].children = [];
+    if (obj[property].patternProperties) {
+      const patterns = obj[property];
+      const props = buildProperties(patterns, patterns.id);
+      buildRoot(patterns, patterns.id, "children", props);
+      newProperty[property] = patterns;
+    }
+  }
+}
+
+function extractPatternProps(object, newProperty, parent) {
+  const obj = object.patternProperties;
+  if (obj[Object.keys(obj)[0]] && obj[Object.keys(obj)[0]].oneOf) {
+    const arrayProps = obj[Object.keys(obj)[0]].oneOf;
+    for (let i = 0; i < arrayProps.length; i++) {
+      const newRef = arrayProps[i]["$ref"].split("/").slice(-1)[0];
+      const title = newRef.split(".")[0];
+      newProperty[title] = arrayProps[i];
+    }
+    delete obj[Object.keys(obj)[0]];
+  }
+  for (const property in obj) {
+    newProperty[property] = obj[property];
+    newProperty[property].parent = parent;
+    newProperty[property].name = property;
+    newProperty[property].id = String(
+      parseInt(Math.random(100000000) * 1000000)
+    );
+    newProperty[property].children = [];
+  }
+}
+
+function extractAdditionalProps(object, newProperty, parent) {
+  const obj = object.additionalProperties;
+  const arrayProps = obj.oneOf || obj.anyOf;
+  if (arrayProps) {
+    for (let i = 0; i < arrayProps.length; i++) {
+      const newRef = arrayProps[i]["$ref"].split("/").slice(-1)[0];
+      const title = newRef.split(".")[0];
+      newProperty[title] = arrayProps[i];
+    }
+  }
+  if (obj.type === "array" && obj.items) {
+    const items = obj.items;
+    newProperty[obj[Object.keys(items)[0]]] = Object.values(items)[0];
+  } else {
+    for (const property in obj) {
+      if (typeof obj[property] === "string") {
+        const data = retrieveObj(asyncapi, obj[property]);
+        object = {
+          ...object,
+          ...data,
+        };
+        if (obj[property] === object["$id"]) {
+          delete object.additionalProperties;
+        }
+        const properties = buildProperties(object, object.id);
+        buildRoot(object, object.id, "children", properties);
+      } else {
+        newProperty[property] = obj[property];
+        newProperty[property].parent = parent;
+        newProperty[property].name = property;
+        newProperty[property].id = String(
+          parseInt(Math.random(100000000) * 1000000)
+        );
+        newProperty[property].children = [];
+      }
+    }
+  }
+  if (newProperty.oneOf) {
+    delete newProperty.oneOf;
+  }
+}
+
+function extractArrayProps(object, newProperty, parent) {
+  if (object.anyOf || object.allOf || object.oneOf) {
+    const oneOfProperty = object.allOf || object.oneOf;
+    if (oneOfProperty) {
+      for (let i = 0; i < oneOfProperty.length; i++) {
+        if (oneOfProperty[i]["$ref"]) {
+          const newRef = oneOfProperty[i]["$ref"].split("/").slice(-1)[0];
+          const title = newRef.split(".")[0];
+          newProperty[title] = oneOfProperty[i];
+          newProperty[title].parent = parent;
+          newProperty[title].name = title;
+          newProperty[title].id = String(
+            parseInt(Math.random(100000000) * 1000000)
+          );
+          newProperty[title].children = [];
+        } else {
+          const children = oneOfProperty[i];
+          const patterns = children.patternProperties;
+          const properties = children.properties;
+          if (patterns) {
+            for (const property in patterns) {
+              newProperty[property] = patterns[property];
+              newProperty[property].id = String(
+                parseInt(Math.random(100000000) * 1000000)
+              );
+              newProperty[property].name = property;
+              newProperty[property].parent = object.id;
+            }
+          }
+          if (properties) {
+            for (const property in properties) {
+              if (properties[property]["$ref"] === object["$id"]) {
+                delete properties[property]["$ref"];
+              }
+              if (
+                properties[property].additionalProperties &&
+                properties[property].additionalProperties["$ref"] ===
+                  object["$id"]
+              ) {
+                delete properties[property].additionalProperties;
+              }
+              newProperty[property] = properties[property];
+              newProperty[property].id = String(
+                parseInt(Math.random(100000000) * 1000000)
+              );
+              newProperty[property].name = property;
+              newProperty[property].parent = object.id;
+            }
+          }
+        }
+      }
+      delete object.allOf;
+    }
+  }
+}
+
 function buildProperties(object: any, parent: number) {
   let newProperty: any = {};
   if (object.properties) {
-    const obj = object.properties;
-    for (const property in obj) {
-      newProperty[property] = obj[property];
-      newProperty[property].parent = parent;
-      newProperty[property].name = property;
-      newProperty[property].id = String(
-        parseInt(Math.random(100000000) * 1000000)
-      );
-      newProperty[property].children = [];
-      if (obj[property].patternProperties) {
-        const patterns = obj[property];
-        const props = buildProperties(patterns, patterns.id);
-        buildRoot(patterns, patterns.id, "children", props);
-        newProperty[property] = patterns;
-      }
-    }
+    extractProps(object, newProperty, parent);
     delete object.properties;
   }
   if (object.patternProperties) {
-    const obj = object.patternProperties;
-    if (obj[Object.keys(obj)[0]] && obj[Object.keys(obj)[0]].oneOf) {
-      const arrayProps = obj[Object.keys(obj)[0]].oneOf;
-      for (let i = 0; i < arrayProps.length; i++) {
-        const newRef = arrayProps[i]["$ref"].split("/").slice(-1)[0];
-        const title = newRef.split(".")[0];
-        newProperty[title] = arrayProps[i];
-      }
-      delete obj[Object.keys(obj)[0]];
-    }
-    for (const property in obj) {
-      newProperty[property] = obj[property];
-      newProperty[property].parent = parent;
-      newProperty[property].name = property;
-      newProperty[property].id = String(
-        parseInt(Math.random(100000000) * 1000000)
-      );
-      newProperty[property].children = [];
-    }
+    extractPatternProps(object, newProperty, parent);
     delete object.patternProperties;
   }
   if (object.additionalProperties && object.additionalProperties !== true) {
-    const obj = object.additionalProperties;
-    const arrayProps = obj.oneOf || obj.anyOf;
-    if (arrayProps) {
-      for (let i = 0; i < arrayProps.length; i++) {
-        const newRef = arrayProps[i]["$ref"].split("/").slice(-1)[0];
-        const title = newRef.split(".")[0];
-        newProperty[title] = arrayProps[i];
-      }
-    }
-    if (obj.type === "array" && obj.items) {
-      const items = obj.items;
-      newProperty[obj[Object.keys(items)[0]]] = Object.values(items)[0];
-    } else {
-      for (const property in obj) {
-        if (typeof obj[property] === "string") {
-          const data = retrieveObj(asyncapi, obj[property]);
-          object = {
-            ...object,
-            ...data,
-          };
-          if (obj[property] === object["$id"]) {
-            delete object.additionalProperties;
-          }
-          const properties = buildProperties(object, object.id);
-          buildRoot(object, object.id, "children", properties);
-        } else {
-          newProperty[property] = obj[property];
-          newProperty[property].parent = parent;
-          newProperty[property].name = property;
-          newProperty[property].id = String(
-            parseInt(Math.random(100000000) * 1000000)
-          );
-          newProperty[property].children = [];
-        }
-      }
-    }
-    if (newProperty.oneOf) {
-      delete newProperty.oneOf;
-    }
+    extractAdditionalProps(object, newProperty, parent);
     delete object.additionalProperties;
   }
   if (
@@ -119,59 +187,7 @@ function buildProperties(object: any, parent: number) {
     !object.patternProperties &&
     !object.additionalProperties
   ) {
-    if (object.anyOf || object.allOf || object.oneOf) {
-      const oneOfProperty = object.allOf || object.oneOf;
-      if (oneOfProperty) {
-        for (let i = 0; i < oneOfProperty.length; i++) {
-          if (oneOfProperty[i]["$ref"]) {
-            const newRef = oneOfProperty[i]["$ref"].split("/").slice(-1)[0];
-            const title = newRef.split(".")[0];
-            newProperty[title] = oneOfProperty[i];
-            newProperty[title].parent = parent;
-            newProperty[title].name = title;
-            newProperty[title].id = String(
-              parseInt(Math.random(100000000) * 1000000)
-            );
-            newProperty[title].children = [];
-          } else {
-            const children = oneOfProperty[i];
-            const patterns = children.patternProperties;
-            const properties = children.properties;
-            if (patterns) {
-              for (const property in patterns) {
-                newProperty[property] = patterns[property];
-                newProperty[property].id = String(
-                  parseInt(Math.random(100000000) * 1000000)
-                );
-                newProperty[property].name = property;
-                newProperty[property].parent = object.id;
-              }
-            }
-            if (properties) {
-              for (const property in properties) {
-                if (properties[property]["$ref"] === object["$id"]) {
-                  delete properties[property]["$ref"];
-                }
-                if (
-                  properties[property].additionalProperties &&
-                  properties[property].additionalProperties["$ref"] ===
-                    object["$id"]
-                ) {
-                  delete properties[property].additionalProperties;
-                }
-                newProperty[property] = properties[property];
-                newProperty[property].id = String(
-                  parseInt(Math.random(100000000) * 1000000)
-                );
-                newProperty[property].name = property;
-                newProperty[property].parent = object.id;
-              }
-            }
-          }
-        }
-        delete object.allOf;
-      }
-    }
+    extractArrayProps(object, newProperty, parent);
   }
   return newProperty;
 }
