@@ -32,8 +32,14 @@ function buildChildrenFromRef(parent, key) {
 function extractProps(object, newProperty, parent) {
   const obj = object.properties;
   for (const property in obj) {
-    if(obj[property].type === "array" && obj[property].oneOf){
-      extractArrayProps(obj[property], newProperty, parent)
+    // TODO: Restructure for message properties
+    if (obj[property].oneOf) {
+      obj[property].additionalProperties = {
+        oneOf: obj[property].oneOf,
+      };
+      const newPatterns = obj[property];
+      const props = buildProperties(newPatterns, newPatterns.id);
+      buildRoot(newPatterns, newPatterns.id, "children", props);
     }
     newProperty[property] = obj[property];
     newProperty[property].parent = parent;
