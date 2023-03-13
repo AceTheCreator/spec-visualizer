@@ -19,7 +19,8 @@ body{
 }
 
 .side-bar{
-  width: 60%;
+  min-width: 40%;
+  max-width: 40%;
   border-left: 1px solid rgb(209, 209, 209);
 }
 .side-bar > h1{

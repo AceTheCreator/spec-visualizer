@@ -202,23 +202,34 @@ function buildProperties(object: any, parent: number) {
   return newProperty;
 }
 
+function buildObjectDescriptionFromMd(key:string){
+if(key){
+  const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
+  const newKeyName = `${capitalized} Object`
+  const description = generateDescription(newKeyName);
+  return description;
+}
+}
+
 function buildRoot(object, parentId, type, properties) {
   if (type === "initial") {
     const properties = buildProperties(asyncapi, parentId);
     object[0].name = asyncapi.title;
       const description = generateDescription("AsyncAPI Object");
       object[0].description = description
-      console.log(object)
+      // console.log(object)
     for (const property in properties) {
       if (properties[property].type === "array" && properties[property].items) {
         const items = properties[property].items;
         properties[property][Object.keys(items)[0]] = Object.values(items)[0];
         delete properties[property].items;
       }
+      const buildDescription = buildObjectDescriptionFromMd(property);
       object[0].children.push({
         ...properties[property],
         parent: parentId,
         name: property,
+        description: buildDescription || properties[property].description,
         id: String(parseInt(Math.random(100000000) * 1000000)),
         children: [],
       });
@@ -233,10 +244,12 @@ function buildRoot(object, parentId, type, properties) {
         properties[property][Object.keys(items)[0]] = Object.values(items)[0];
         delete properties[property].items;
       }
+      const buildDescription = buildObjectDescriptionFromMd(property);
       object.children.push({
         ...properties[property],
         parent: parentId || object.id,
         name: property,
+        description: buildDescription || properties[property].description,
         id:
           properties[property].id ||
           String(parseInt(Math.random(100000000) * 1000000)),

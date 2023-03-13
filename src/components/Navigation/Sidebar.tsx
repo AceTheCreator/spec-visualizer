@@ -6,20 +6,24 @@ import * as getMDXComponents from '../MDX';
 
 function Sidebar({node}) {
   if (Object.keys(node).length) {
-    console.log(node)
     const nodeData = node.data
+    console.log(nodeData)
     const description = toMarkdown(nodeData.description);
     return (
       <div className="side-bar p-6">
         <h1 className="my-4 font-heading antialiased font-semibold tracking-heading text-gray-900 text-2xl">
           {nodeData.label}
         </h1>
-        <ReactMarkdown
-          remarkPlugins={[remarkGfm]}
-          components={getMDXComponents}
-        >
-          {description}
-        </ReactMarkdown>
+        {typeof nodeData.description === "string" ? (
+          <div>{nodeData.description}</div>
+        ) : (
+          <ReactMarkdown
+            remarkPlugins={[remarkGfm]}
+            components={getMDXComponents}
+          >
+            {description}
+          </ReactMarkdown>
+        )}
       </div>
     );
   }

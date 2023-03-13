@@ -123,10 +123,11 @@ const Nodes = ({setCurrentNode}) => {
               label: item.name,
               children: item.children,
               parent: item.parent,
+              description: item.description,
             },
             sourcePosition: "right",
             targetPosition: "left",
-            draggable: false
+            draggable: false,
           };
         }),
       ];

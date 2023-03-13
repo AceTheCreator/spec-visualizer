@@ -1,3 +1,6 @@
+import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { coldarkDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+
 const H1 = ({ children }) => {
   return (
     <h1 className="my-4 font-heading antialiased font-semibold tracking-heading text-gray-900 text-2xl">
@@ -89,6 +92,25 @@ const TableDirection = ({ children }) => {
   );
 };
 
+const CodeComponent = ({ children, inline, props, className="" }) => {
+const match = /language-(\w+)/.exec(className || "");
+return !inline && match ? (
+  <SyntaxHighlighter
+    language={match[1]}
+    PreTag="section"
+    style={coldarkDark}
+    showLineNumbers={true}
+    {...props}
+  >
+    {String(children).replace(/\n$/, "")}
+  </SyntaxHighlighter>
+) : (
+  <code className={className} {...props}>
+    {children}
+  </code>
+);
+}
+
 export const table = TableComponent;
 export const th = TableHead;
 export const tr = TableRow;
@@ -100,3 +122,4 @@ export const h4 = H4;
 export const h5 = H5;
 export const h6 = H6;
 export const p = Paragraph;
+export const code = CodeComponent;

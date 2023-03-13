@@ -25,6 +25,7 @@
     "react-d3-tree": "^3.5.0",
     "react-dom": "18.2.0",
     "react-markdown": "^8.0.5",
+    "react-syntax-highlighter": "^15.5.0",
     "reactflow": "^11.4.2",
     "remark-gfm": "^3.0.1",
     "traverse": "^0.6.7",
