@@ -1,5 +1,6 @@
+import generateDescription from "@/utils/generateDescription";
 import { retrieveObj } from "@/utils/simpleReuse";
-import fs, { writeFileSync, existsSync, readdirSync } from "fs";
+import { writeFileSync } from "fs";
 import path, { resolve } from "path";
 import asyncapi from "../data/2.5.0/asyncapi.json";
 
@@ -205,6 +206,9 @@ function buildRoot(object, parentId, type, properties) {
   if (type === "initial") {
     const properties = buildProperties(asyncapi, parentId);
     object[0].name = asyncapi.title;
+      const description = generateDescription("AsyncAPI Object");
+      object[0].description = description
+      console.log(object)
     for (const property in properties) {
       if (properties[property].type === "array" && properties[property].items) {
         const items = properties[property].items;

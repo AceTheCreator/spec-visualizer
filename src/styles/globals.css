@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @import url('https://fonts.googleapis.com/css2?family=Lato:wght@300;400&display=swap');
 
 body{
@@ -11,13 +15,21 @@ body{
 .react-flow__node{
   background: rgba(27, 17, 48, 1) !important;
   color: white !important;
+  min-width: 153px !important;
 }
 
 .side-bar{
-  width: 40%;
+  width: 60%;
   border-left: 1px solid rgb(209, 209, 209);
-  padding: 5px;
 }
 .side-bar > h1{
   font-weight: bold;
+}
+
+th:nth-child(1){
+  display: none !important;
+}
+
+td:nth-child(1){
+  display: none !important;
 }

@@ -101,7 +101,7 @@ const Nodes = ({setCurrentNode}) => {
         return {
           id: item.id,
           type: item?.children?.length ? "default" : "output",
-          data: { label: item.name, children: item.children },
+          data: { label: item.name, children: item.children, description: item.description },
           position: { x: 0, y: 0 },
           sourcePosition: "right",
           targetPosition: "left",

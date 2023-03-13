@@ -18,7 +18,6 @@ export default function parse (mdContent: string) {
         headings.push(item.text);
       } else {
         const parentHeading = getParentHeading(headings, item, result);
-        // console.log(parentHeading)
         headings = parentHeading.headings;
         if (!parentHeading.parent) {
           for (let i = 0; i < headings.length; i++) {
