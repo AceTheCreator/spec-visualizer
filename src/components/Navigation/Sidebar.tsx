@@ -7,7 +7,6 @@ import * as getMDXComponents from '../MDX';
 function Sidebar({node}) {
   if (Object.keys(node).length) {
     const nodeData = node.data
-    console.log(nodeData)
     const description = toMarkdown(nodeData.description);
     return (
       <div className="side-bar p-6">
@@ -19,6 +18,7 @@ function Sidebar({node}) {
         ) : (
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
+            
             components={getMDXComponents}
           >
             {description}

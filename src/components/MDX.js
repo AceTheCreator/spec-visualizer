@@ -1,5 +1,5 @@
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { coldarkDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+// import { coldarkDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const H1 = ({ children }) => {
   return (
@@ -56,12 +56,13 @@ const Paragraph = ({ children }) => {
   );
 };
 
-const TableComponent = ({ children }) => {
+const TableComponent = ({ children, ...props }) => {
+    console.log(props)
   return (
     <div className="flex flex-col">
       <div className="">
         <div className="align-middle inline-block w-full shadow overflow-auto sm:rounded-lg border-b border-gray-200">
-          <table className="table-fixed">{...children}</table>
+          <table className="table-fixed">{children}</table>
         </div>
       </div>
     </div>
@@ -98,7 +99,7 @@ return !inline && match ? (
   <SyntaxHighlighter
     language={match[1]}
     PreTag="section"
-    style={coldarkDark}
+    // style={coldarkDark}
     showLineNumbers={true}
     {...props}
   >
