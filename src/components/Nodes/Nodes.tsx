@@ -150,7 +150,7 @@ const Nodes = ({setCurrentNode}) => {
       setNodes([...layoutedNodes]);
       setEdges([...layoutedEdges]);
       if (itemChildren.length) {
-        focusNode(itemChildren[3].position.x, itemChildren[3].position.y, 1.85);
+        focusNode(itemChildren[3].position.x, itemChildren[3].position.y, 0.9);
       }
     } else {
       const newNodes = removeChildren(data.data, nodes);
@@ -186,7 +186,7 @@ const Nodes = ({setCurrentNode}) => {
         onNodeClick={handleNodeClick}
         onNodeMouseEnter={handleMouseEnter}
         fitView
-        defaultViewport={{ x: 1, y: 1, zoom: 0.5 }}
+        defaultViewport={{ x: 1, y: 1, zoom: 0.9 }}
       />
     </div>
   );

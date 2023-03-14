@@ -1,4 +1,5 @@
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
+import { useRouter } from "next/router";
 // import { coldarkDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 
 const H1 = ({ children }) => {
@@ -57,7 +58,6 @@ const Paragraph = ({ children }) => {
 };
 
 const TableComponent = ({ children, ...props }) => {
-    console.log(props)
   return (
     <div className="flex flex-col">
       <div className="">
@@ -80,7 +80,19 @@ const TableHead = ({ children }) => {
 };
 
 const TableRow = ({ children }) => {
-  return <tr className={`bg-white`}>{children}</tr>;
+    const router = useRouter();
+    const active = router.query.node
+    const title =
+      children[0].props.children[children[0].props.children.length - 1];
+  return (
+    <tr
+      className={`${
+        active === title ? "bg-[#1b1130] [&>td]:text-white" : "bg-white"
+      }`}
+    >
+      {children}
+    </tr>
+  );
 };
 
 const TableDirection = ({ children }) => {

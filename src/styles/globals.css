@@ -27,10 +27,10 @@ body{
   font-weight: bold;
 }
 
-/* th:nth-child(1){
+th:nth-child(1){
   display: none !important;
 }
 
 td:nth-child(1){
   display: none !important;
-} */
+}
