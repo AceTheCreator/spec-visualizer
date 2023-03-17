@@ -19,7 +19,7 @@ const tree: Array<TreeInterface> = [
   },
 ];
 
-function buildChildrenFromRef(parent, key) {
+function buildChildrenFromRef(parent, key) { 
   const data = retrieveObj(asyncapi, key);
   parent = {
     ...parent,
@@ -205,9 +205,36 @@ function buildProperties(object: any, parent: number) {
 function buildObjectDescriptionFromMd(key:string){
 if(key){
   const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
-  const newKeyName = `${capitalized} Object`
+  let newKeyName = `${capitalized} Object`
+
+  // They are some objects i couldn't retrieve programmatically so
+  // i had to add them manually
+  if(key === "externalDocs"){
+    newKeyName = "External Documentation Object"
+  }
+  if(key === "tags"){
+    newKeyName = "Tag Object";
+  }
+  if(key === "schemas"){
+    newKeyName = "Schema Object"
+  }
+  if(key === "publish" || key === "subscribe"){
+    newKeyName = "Operation Object";
+  }
+  if(key === "bindings"){
+    newKeyName = "Operation Bindings Object";
+  }
+    if (key === "operationTrait") {
+      newKeyName = "Operation Trait Object";
+    }
+    if(key === "security"){
+      newKeyName = "Security Requirement Object";
+    }
+    if(key === "securityScheme"){
+      newKeyName = "Security Scheme Object"
+    }
   const description = generateDescription(newKeyName);
-  return description;
+  return {title: newKeyName, description};
 }
 }
 
@@ -217,7 +244,7 @@ function buildRoot(object, parentId, type, properties) {
     object[0].name = asyncapi.title;
       const description = generateDescription("AsyncAPI Object");
       object[0].description = description
-      // console.log(object)
+      object[0].title = "AsyncAPI Object";
     for (const property in properties) {
       if (properties[property].type === "array" && properties[property].items) {
         const items = properties[property].items;
@@ -229,7 +256,8 @@ function buildRoot(object, parentId, type, properties) {
         ...properties[property],
         parent: parentId,
         name: property,
-        description: buildDescription || properties[property].description,
+        title: buildDescription?.title,
+        description: buildDescription?.description || properties[property].description,
         id: String(parseInt(Math.random(100000000) * 1000000)),
         children: [],
       });
@@ -249,7 +277,8 @@ function buildRoot(object, parentId, type, properties) {
         ...properties[property],
         parent: parentId || object.id,
         name: property,
-        description: buildDescription || properties[property].description,
+        title: buildDescription?.title,
+        description: buildDescription?.description || properties[property].description,
         id:
           properties[property].id ||
           String(parseInt(Math.random(100000000) * 1000000)),

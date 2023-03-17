@@ -79,11 +79,33 @@ const TableHead = ({ children }) => {
   );
 };
 
+export const Ul = ({children}) => {
+  return (
+    <ul className="my-4 ml-4 list-disc text-gray-700 font-normal font-body antialiased">
+      {children}
+    </ul>
+  );
+}
+
+export const Ol = ({children}) => {
+return (
+  <ol className="my-4 ml-4 list-decimal text-gray-700 font-normal font-body antialiased">{children}</ol>
+)
+}
+
+export const Li = ({children}) => {
+  return (
+    <li className="my-3 text-gray-700 font-regular tracking-tight font-body antialiased">{children}</li>
+  );
+}
+
 const TableRow = ({ children }) => {
-    const router = useRouter();
-    const active = router.query.node
-    const title =
-      children[0].props.children[children[0].props.children.length - 1];
+  const router = useRouter();
+  const active = router.query.node;
+  let title = children[0].props.children[children[0].props.children.length - 1];
+  if (typeof title === "object") {
+    title = title.props.children[0];
+  }
   return (
     <tr
       className={`${
@@ -105,24 +127,24 @@ const TableDirection = ({ children }) => {
   );
 };
 
-const CodeComponent = ({ children, inline, props, className="" }) => {
-const match = /language-(\w+)/.exec(className || "");
-return !inline && match ? (
-  <SyntaxHighlighter
-    language={match[1]}
-    PreTag="section"
-    // style={coldarkDark}
-    showLineNumbers={true}
-    {...props}
-  >
-    {String(children).replace(/\n$/, "")}
-  </SyntaxHighlighter>
-) : (
-  <code className={className} {...props}>
-    {children}
-  </code>
-);
-}
+const CodeComponent = ({ children, inline, props, className = "" }) => {
+  const match = /language-(\w+)/.exec(className || "");
+  return !inline && match ? (
+    <SyntaxHighlighter
+      language={match[1]}
+      PreTag="section"
+      // style={coldarkDark}
+      showLineNumbers={true}
+      {...props}
+    >
+      {String(children).replace(/\n$/, "")}
+    </SyntaxHighlighter>
+  ) : (
+    <code className={className} {...props}>
+      {children}
+    </code>
+  );
+};
 
 export const table = TableComponent;
 export const th = TableHead;
@@ -136,3 +158,6 @@ export const h5 = H5;
 export const h6 = H6;
 export const p = Paragraph;
 export const code = CodeComponent;
+export const ul = Ul;
+export const ol = Ol;
+export const li = Li;

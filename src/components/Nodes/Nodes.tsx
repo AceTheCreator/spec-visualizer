@@ -73,7 +73,7 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
   initialEdges
 );
 
-const Nodes = ({setCurrentNode}) => {
+const Nodes = ({setCurrentNode, passNodes}) => {
   const reactFlowWrapper = useRef(null);
   const { setCenter } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(layoutedNodes);
@@ -101,7 +101,7 @@ const Nodes = ({setCurrentNode}) => {
         return {
           id: item.id,
           type: item?.children?.length ? "default" : "output",
-          data: { label: item.name, children: item.children, description: item.description },
+          data: { label: item.name, children: item.children, description: item.description, title: item.title },
           position: { x: 0, y: 0 },
           sourcePosition: "right",
           targetPosition: "left",
@@ -124,6 +124,7 @@ const Nodes = ({setCurrentNode}) => {
               children: item.children,
               parent: item.parent,
               description: item.description,
+              title: item.title
             },
             sourcePosition: "right",
             targetPosition: "left",
@@ -160,41 +161,44 @@ const Nodes = ({setCurrentNode}) => {
   };
   function handleMouseEnter(e: MouseEvent, data: Node){
     setCurrentNode(data);
+    passNodes(nodes)
 
   }
   const edgeTypes = {
     smart: SmartBezierEdge,
   };
-
+const test = {
+  1: "hello"
+}
   return (
-    <div
-      className="wrapper"
-      ref={reactFlowWrapper}
-      style={{
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <ReactFlow
-        nodes={nodes}
-        edges={edges}
-        edgeTypes={edgeTypes}
-        onNodesChange={onNodesChange}
-        connectionLineType={ConnectionLineType.SmoothStep}
-        onEdgesChange={onEdgesChange}
-        onConnect={onConnect}
-        onNodeClick={handleNodeClick}
-        onNodeMouseEnter={handleMouseEnter}
-        fitView
-        defaultViewport={{ x: 1, y: 1, zoom: 0.9 }}
-      />
-    </div>
+      <div
+        className="wrapper"
+        ref={reactFlowWrapper}
+        style={{
+          width: "100%",
+          height: "100vh",
+        }}
+      >
+        <ReactFlow
+          nodes={nodes}
+          edges={edges}
+          edgeTypes={edgeTypes}
+          onNodesChange={onNodesChange}
+          connectionLineType={ConnectionLineType.SmoothStep}
+          onEdgesChange={onEdgesChange}
+          onConnect={onConnect}
+          onNodeClick={handleNodeClick}
+          onNodeMouseEnter={handleMouseEnter}
+          fitView
+          defaultViewport={{ x: 1, y: 1, zoom: 0.9 }}
+        />
+      </div>
   );
 };
 
 // eslint-disable-next-line react/display-name
-export default ({setCurrentNode}) => (
+export default ({setCurrentNode, passNodes}) => (
   <ReactFlowProvider>
-    <Nodes setCurrentNode={setCurrentNode} />
+    <Nodes setCurrentNode={setCurrentNode} passNodes={passNodes} />
   </ReactFlowProvider>
 );

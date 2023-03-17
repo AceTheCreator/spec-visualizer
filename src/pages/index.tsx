@@ -4,11 +4,16 @@ import Nodes from "../components/Nodes/Nodes";
 
 export default function Home() {
   const [currentNode, setCurrentNode] = useState({})
+  const [nodes, passNodes] = useState();
   return (
     <div>
       <div className="body-wrapper">
-        <Nodes setCurrentNode={setCurrentNode}  />
-        <Sidebar node={currentNode} />
+        <Nodes setCurrentNode={setCurrentNode} passNodes={passNodes} />
+        <Sidebar
+          node={currentNode}
+          nodes={nodes}
+          setCurrentNode={setCurrentNode}
+        />
       </div>
     </div>
   );
