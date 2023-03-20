@@ -75,6 +75,7 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
 
 const Nodes = ({setCurrentNode, passNodes}) => {
   const reactFlowWrapper = useRef(null);
+  const ref = useRef(null);
   const { setCenter } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(layoutedNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState<Edge[]>(layoutedEdges);
@@ -160,6 +161,8 @@ const Nodes = ({setCurrentNode, passNodes}) => {
     }
   };
   function handleMouseEnter(e: MouseEvent, data: Node){
+    // const tr = ref.current;
+    // console.log(tr);
     setCurrentNode(data);
     passNodes(nodes)
 

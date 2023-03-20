@@ -36,3 +36,7 @@ th:nth-child(1){
 td:nth-child(1){
   display: none !important;
 }
+
+.active{
+  background: #1b1130
+}

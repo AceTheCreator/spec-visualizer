@@ -99,26 +99,27 @@ export const Li = ({children}) => {
   );
 }
 
-const TableRow = ({ children }) => {
-  const router = useRouter();
-  const active = router.query.node;
-  let title = children[0].props.children[children[0].props.children.length - 1];
+// const TableRow = ({ children }) => {
+//   const router = useRouter();
+//   const active = router.query.node;
+//   let title = children[0].props.children[children[0].props.children.length - 1];
+//   console.log(title)
   if (typeof title === "object") {
     title = title.props.children[0];
   }
-  if(active === title){
-    console.log("hll")
-  }
-  return (
-    <tr
-      className={`${
-        active === title ? "bg-[#1b1130] [&>td]:text-white" : "bg-white"
-      }`}
-    >
-      {children}
-    </tr>
-  );
-};
+//   if(active === title){
+//     console.log(active)
+//   }
+//   return (
+//     <tr
+//       className={`${
+//         active === title ? "bg-[#1b1130] [&>td]:text-white" : "bg-white"
+//       } ${title}`}
+//     >
+//       {children}
+//     </tr>
+//   );
+// };
 
 const TableDirection = ({ children }) => {
   return (
@@ -151,7 +152,7 @@ const CodeComponent = ({ children, inline, props, className = "" }) => {
 
 export const table = TableComponent;
 export const th = TableHead;
-export const tr = TableRow;
+// export const tr = TableRow;
 export const td = TableDirection;
 export const h1 = H1;
 export const h2 = H2;
