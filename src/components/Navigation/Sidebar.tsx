@@ -18,7 +18,7 @@ function Sidebar({ node, nodes, setCurrentNode }) {
         const findParent = nodes.filter(
           (item) => item?.id == node?.data?.parent
         );
-        setCurrentNode(findParent[0])
+        // setCurrentNode(findParent[0])
       }
       router.push({
         pathname: "/",

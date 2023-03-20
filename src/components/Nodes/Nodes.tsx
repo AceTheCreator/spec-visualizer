@@ -167,9 +167,6 @@ const Nodes = ({setCurrentNode, passNodes}) => {
   const edgeTypes = {
     smart: SmartBezierEdge,
   };
-const test = {
-  1: "hello"
-}
   return (
       <div
         className="wrapper"

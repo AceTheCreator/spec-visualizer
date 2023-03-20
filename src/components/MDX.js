@@ -57,7 +57,7 @@ const Paragraph = ({ children }) => {
   );
 };
 
-const TableComponent = ({ children, ...props }) => {
+const TableComponent = ({ children }) => {
   return (
     <div className="flex flex-col">
       <div className="">
@@ -105,6 +105,9 @@ const TableRow = ({ children }) => {
   let title = children[0].props.children[children[0].props.children.length - 1];
   if (typeof title === "object") {
     title = title.props.children[0];
+  }
+  if(active === title){
+    console.log("hll")
   }
   return (
     <tr

@@ -209,30 +209,53 @@ if(key){
 
   // They are some objects i couldn't retrieve programmatically so
   // i had to add them manually
-  if(key === "externalDocs"){
-    newKeyName = "External Documentation Object"
-  }
-  if(key === "tags"){
-    newKeyName = "Tag Object";
-  }
-  if(key === "schemas"){
-    newKeyName = "Schema Object"
-  }
-  if(key === "publish" || key === "subscribe"){
-    newKeyName = "Operation Object";
-  }
-  if(key === "bindings"){
-    newKeyName = "Operation Bindings Object";
-  }
-    if (key === "operationTrait") {
+  switch (key) {
+    case "externalDocs":
+      newKeyName = "External Documentation Object";
+      break;
+    case "tags":
+      newKeyName = "Tag Object";
+      break;
+    case "schemas":
+      newKeyName = "Schema Object";
+      break;
+    case "publish" || "subscribe":
+      newKeyName = "Operation Object";
+      break;
+    case "operationBindings":
+      newKeyName = "Operation Bindings Object";
+      break;
+    case "operationTraits":
       newKeyName = "Operation Trait Object";
-    }
-    if(key === "security"){
+      break;
+    case "security":
       newKeyName = "Security Requirement Object";
-    }
-    if(key === "securityScheme"){
-      newKeyName = "Security Scheme Object"
-    }
+      break; 
+    case "SecurityScheme":
+      newKeyName = "Security Scheme Object";
+      break;
+    case "serverVariable":
+      newKeyName = "Server Variable Object";
+      break;
+    case "messageBindings":
+      newKeyName = "Message Bindings Object";
+      break;
+    case "serverBindings":
+      newKeyName = "Server Bindings Object";
+      break;
+    case "channelBindings":
+      newKeyName = "Channel Bindings Object";
+      break;
+    case "correlationIds":
+      newKeyName = "Correlation ID Object";
+      break;
+    case "messageTraits":
+      newKeyName = "Message Trait Object";
+      break;
+    default:
+      break;
+  }
+
   const description = generateDescription(newKeyName);
   return {title: newKeyName, description};
 }
