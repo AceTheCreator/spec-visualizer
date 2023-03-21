@@ -26,9 +26,13 @@ function buildChildrenFromRef(parent, key) {
     ...data,
   };
   const properties = buildProperties(parent, parent.id);
-
+  //  if (!parent.id) {
+  //    console.log(parent);
+  //  }
   buildRoot(parent, parent.id, "children", properties);
 }
+
+// function buildFromChildren(parent)
 
 function extractProps(object, newProperty, parent) {
   const obj = object.properties;
@@ -321,6 +325,14 @@ function buildRoot(object, parentId, type, properties) {
           String(parseInt(Math.random(100000000) * 1000000)),
         children: properties[property].children || [],
       });
+    }
+    if (object.name === "message") {
+      const objChildren = object.children;
+      for(let i = 0; i < objChildren.length; i++){
+        if(objChildren[i]["$ref"]){
+          buildChildrenFromRef(objChildren[i], objChildren[i]["$ref"])
+        }
+      }
     }
   }
 }
