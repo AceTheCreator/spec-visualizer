@@ -26,13 +26,20 @@ function buildChildrenFromRef(parent, key) {
     ...data,
   };
   const properties = buildProperties(parent, parent.id);
-  //  if (!parent.id) {
-  //    console.log(parent);
-  //  }
   buildRoot(parent, parent.id, "children", properties);
 }
 
-// function buildFromChildren(parent)
+function buildFromChildren(object) {
+  if (object["$ref"]) {
+    const data = retrieveObj(asyncapi, object["$ref"]);
+    object = {
+      ...object,
+      ...data,
+    };
+  }
+  const properties = buildProperties(object, object.id);
+  buildRoot(object, object.id, "children", properties);
+}
 
 function extractProps(object, newProperty, parent) {
   const obj = object.properties;
@@ -109,11 +116,27 @@ function extractAdditionalProps(object, newProperty, parent) {
           ...object,
           ...data,
         };
+        if (object.name === "messages") {
+          console.log(object);
+        }
         if (obj[property] === object["$id"]) {
           delete object.additionalProperties;
         }
-        const properties = buildProperties(object, object.id);
-        buildRoot(object, object.id, "children", properties);
+        if(object.oneOf || object.allOf){
+          extractArrayProps(object, newProperty, parent);
+        }
+        if(object.properties){
+        const newProps = object.properties;
+        for (const a in newProps){
+          newProperty[a] = newProps[a];
+          newProperty[a].parent = parent;
+          newProperty[a].name = a;
+          newProperty[a].id = String(
+            parseInt(Math.random(100000000) * 1000000)
+          );
+          newProperty[a].children = [];
+        }
+        }
       } else {
         newProperty[property] = obj[property];
         newProperty[property].parent = parent;
@@ -184,7 +207,9 @@ function extractArrayProps(object, newProperty, parent) {
             newProperty[title] = children.oneOf[1];
             newProperty[title].parent = parent;
             newProperty[title].name = title;
-            newProperty[title].id = "23433";
+            newProperty[title].id = String(
+              parseInt(Math.random(100000000) * 1000000)
+            );;
             newProperty[title].children = [];
           }
         }
@@ -302,6 +327,10 @@ function buildRoot(object, parentId, type, properties) {
         children: [],
       });
     }
+    const objChildren = object[0].children;
+    for (let i = 0; i < objChildren.length; i++) {
+      buildFromChildren(objChildren[i]);
+    }
   } else {
     if (!object.children) {
       object["children"] = [];
@@ -326,12 +355,13 @@ function buildRoot(object, parentId, type, properties) {
         children: properties[property].children || [],
       });
     }
-    if (object.name === "message") {
-      const objChildren = object.children;
-      for(let i = 0; i < objChildren.length; i++){
-        if(objChildren[i]["$ref"]){
-          buildChildrenFromRef(objChildren[i], objChildren[i]["$ref"])
+        if (object.name === "messages") {
+          console.log(object)
         }
+    const objChildren = object.children;
+    for (let i = 0; i < objChildren.length; i++) {
+      if (objChildren[i].children.length <= 0) {
+        buildFromChildren(objChildren[i]);
       }
     }
   }
@@ -375,8 +405,8 @@ function getObject(theObject: any, key: string) {
 
 export default async function buildTree() {
   buildRoot(tree, 1, "initial", null);
-  getObject(tree, "$ref");
-  getObject(tree, "additionalProperties");
+  // getObject(tree, "$ref");
+  // getObject(tree, "additionalProperties");
   writeFileSync(
     resolve(__dirname, `../configs`, "2.5.0.json"),
     JSON.stringify(tree)

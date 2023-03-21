@@ -1,4 +1,4 @@
-function removeByAttr (arr, attr, value) {
+function removeByAttr(arr, attr, value) {
   var i = arr.length;
   while (i--) {
     if (
@@ -11,7 +11,7 @@ function removeByAttr (arr, attr, value) {
     }
   }
   return arr;
-};
+}
 
 export function removeChildren(parentNode: any, nodes: any) {
   let newNodes = nodes;
