@@ -19,7 +19,7 @@ const tree: Array<TreeInterface> = [
   },
 ];
 
-function buildChildrenFromRef(parent, key) { 
+function buildChildrenFromRef(parent, key) {
   const data = retrieveObj(asyncapi, key);
   parent = {
     ...parent,
@@ -42,18 +42,20 @@ function extractProps(object, newProperty, parent) {
       const props = buildProperties(newPatterns, newPatterns.id);
       buildRoot(newPatterns, newPatterns.id, "children", props);
     }
-    newProperty[property] = obj[property];
-    newProperty[property].parent = parent;
-    newProperty[property].name = property;
-    newProperty[property].id = String(
-      parseInt(Math.random(100000000) * 1000000)
-    );
-    newProperty[property].children = [];
-    if (obj[property].patternProperties) {
-      const patterns = obj[property];
-      const props = buildProperties(patterns, patterns.id);
-      buildRoot(patterns, patterns.id, "children", props);
-      newProperty[property] = patterns;
+    if (typeof obj[property] === "object") {
+      newProperty[property] = obj[property];
+      newProperty[property].parent = parent;
+      newProperty[property].name = property;
+      newProperty[property].id = String(
+        parseInt(Math.random(100000000) * 1000000)
+      );
+      newProperty[property].children = [];
+      if (obj[property].patternProperties) {
+        const patterns = obj[property];
+        const props = buildProperties(patterns, patterns.id);
+        buildRoot(patterns, patterns.id, "children", props);
+        newProperty[property] = patterns;
+      }
     }
   }
 }
@@ -70,13 +72,15 @@ function extractPatternProps(object, newProperty, parent) {
     delete obj[Object.keys(obj)[0]];
   }
   for (const property in obj) {
-    newProperty[property] = obj[property];
-    newProperty[property].parent = parent;
-    newProperty[property].name = property;
-    newProperty[property].id = String(
-      parseInt(Math.random(100000000) * 1000000)
-    );
-    newProperty[property].children = [];
+    if (typeof obj[property] === "object") {
+      newProperty[property] = obj[property];
+      newProperty[property].parent = parent;
+      newProperty[property].name = property;
+      newProperty[property].id = String(
+        parseInt(Math.random(100000000) * 1000000)
+      );
+      newProperty[property].children = [];
+    }
   }
 }
 
@@ -124,13 +128,13 @@ function extractAdditionalProps(object, newProperty, parent) {
 
 function extractArrayProps(object, newProperty, parent) {
   if (object.anyOf || object.allOf || object.oneOf) {
-    const oneOfProperty = object.allOf || object.oneOf;
-    if (oneOfProperty) {
-      for (let i = 0; i < oneOfProperty.length; i++) {
-        if (oneOfProperty[i]["$ref"]) {
-          const newRef = oneOfProperty[i]["$ref"].split("/").slice(-1)[0];
+    const arrayOfProps = object.allOf || object.oneOf;
+    if (arrayOfProps) {
+      for (let i = 0; i < arrayOfProps.length; i++) {
+        if (arrayOfProps[i]["$ref"]) {
+          const newRef = arrayOfProps[i]["$ref"].split("/").slice(-1)[0];
           const title = newRef.split(".")[0];
-          newProperty[title] = oneOfProperty[i];
+          newProperty[title] = arrayOfProps[i];
           newProperty[title].parent = parent;
           newProperty[title].name = title;
           newProperty[title].id = String(
@@ -138,7 +142,7 @@ function extractArrayProps(object, newProperty, parent) {
           );
           newProperty[title].children = [];
         } else {
-          const children = oneOfProperty[i];
+          const children = arrayOfProps[i];
           const patterns = children.patternProperties;
           const properties = children.properties;
           if (patterns) {
@@ -171,6 +175,14 @@ function extractArrayProps(object, newProperty, parent) {
               newProperty[property].parent = object.id;
             }
           }
+          if (object.name === "messages") {
+            const title = "message";
+            newProperty[title] = children.oneOf[1];
+            newProperty[title].parent = parent;
+            newProperty[title].name = title;
+            newProperty[title].id = "23433";
+            newProperty[title].children = [];
+          }
         }
       }
       delete object.allOf;
@@ -202,72 +214,72 @@ function buildProperties(object: any, parent: number) {
   return newProperty;
 }
 
-function buildObjectDescriptionFromMd(key:string){
-if(key){
-  const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
-  let newKeyName = `${capitalized} Object`
+function buildObjectDescriptionFromMd(key: string) {
+  if (key) {
+    const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
+    let newKeyName = `${capitalized} Object`;
 
-  // They are some objects i couldn't retrieve programmatically so
-  // i had to add them manually
-  switch (key) {
-    case "externalDocs":
-      newKeyName = "External Documentation Object";
-      break;
-    case "tags":
-      newKeyName = "Tag Object";
-      break;
-    case "schemas":
-      newKeyName = "Schema Object";
-      break;
-    case "publish" || "subscribe":
-      newKeyName = "Operation Object";
-      break;
-    case "operationBindings":
-      newKeyName = "Operation Bindings Object";
-      break;
-    case "operationTraits":
-      newKeyName = "Operation Trait Object";
-      break;
-    case "security":
-      newKeyName = "Security Requirement Object";
-      break; 
-    case "SecurityScheme":
-      newKeyName = "Security Scheme Object";
-      break;
-    case "serverVariable":
-      newKeyName = "Server Variable Object";
-      break;
-    case "messageBindings":
-      newKeyName = "Message Bindings Object";
-      break;
-    case "serverBindings":
-      newKeyName = "Server Bindings Object";
-      break;
-    case "channelBindings":
-      newKeyName = "Channel Bindings Object";
-      break;
-    case "correlationIds":
-      newKeyName = "Correlation ID Object";
-      break;
-    case "messageTraits":
-      newKeyName = "Message Trait Object";
-      break;
-    default:
-      break;
+    // They are some objects i couldn't retrieve programmatically so
+    // i had to add them manually
+    switch (key) {
+      case "externalDocs":
+        newKeyName = "External Documentation Object";
+        break;
+      case "tags":
+        newKeyName = "Tag Object";
+        break;
+      case "schemas":
+        newKeyName = "Schema Object";
+        break;
+      case "publish" || "subscribe":
+        newKeyName = "Operation Object";
+        break;
+      case "operationBindings":
+        newKeyName = "Operation Bindings Object";
+        break;
+      case "operationTraits":
+        newKeyName = "Operation Trait Object";
+        break;
+      case "security":
+        newKeyName = "Security Requirement Object";
+        break;
+      case "SecurityScheme":
+        newKeyName = "Security Scheme Object";
+        break;
+      case "serverVariable":
+        newKeyName = "Server Variable Object";
+        break;
+      case "messageBindings":
+        newKeyName = "Message Bindings Object";
+        break;
+      case "serverBindings":
+        newKeyName = "Server Bindings Object";
+        break;
+      case "channelBindings":
+        newKeyName = "Channel Bindings Object";
+        break;
+      case "correlationIds":
+        newKeyName = "Correlation ID Object";
+        break;
+      case "messageTraits":
+        newKeyName = "Message Trait Object";
+        break;
+      default:
+        break;
+    }
+
+    const description = generateDescription(newKeyName);
+    return { title: newKeyName, description };
   }
-
-  const description = generateDescription(newKeyName);
-  return {title: newKeyName, description};
-}
 }
 
 function buildRoot(object, parentId, type, properties) {
   if (type === "initial") {
     const properties = buildProperties(asyncapi, parentId);
     object[0].name = asyncapi.title;
-      const description = generateDescription("AsyncAPI Object");
-      object[0].description = description
-      object[0].title = "AsyncAPI Object";
+    const description = generateDescription("AsyncAPI Object");
+    object[0].description = description;
+    object[0].title = "AsyncAPI Object";
     for (const property in properties) {
       if (properties[property].type === "array" && properties[property].items) {
         const items = properties[property].items;
@@ -280,7 +292,8 @@ function buildRoot(object, parentId, type, properties) {
         parent: parentId,
         name: property,
         title: buildDescription?.title,
-        description: buildDescription?.description || properties[property].description,
+        description:
+          buildDescription?.description || properties[property].description,
         id: String(parseInt(Math.random(100000000) * 1000000)),
         children: [],
       });
@@ -301,7 +314,8 @@ function buildRoot(object, parentId, type, properties) {
         parent: parentId || object.id,
         name: property,
         title: buildDescription?.title,
-        description: buildDescription?.description || properties[property].description,
+        description:
+          buildDescription?.description || properties[property].description,
         id:
           properties[property].id ||
           String(parseInt(Math.random(100000000) * 1000000)),
