@@ -21,12 +21,15 @@ async function createFile(dir: string, name: string, data: string){
 
 export default async function buildSpecs() {
   try {
-    let res = await fetch("http://asyncapi.com/definitions/2.5.0.json", {
-      method: "get",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
+    let res = await fetch(
+      "https://github.com/asyncapi/spec-json-schemas/blob/next-major-spec/schemas/3.0.0.json",
+      {
+        method: "get",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      }
+    );
     const spec: any = await res.json();
     const properties = spec.properties;
     const definitions = spec.definitions;

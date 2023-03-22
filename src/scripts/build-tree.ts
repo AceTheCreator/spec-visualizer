@@ -116,9 +116,9 @@ function extractAdditionalProps(object, newProperty, parent) {
           ...object,
           ...data,
         };
-        if (object.name === "messages") {
-          console.log(object);
-        }
+        // if (object.name === "messages") {
+        //   console.log(object);
+        // }
         if (obj[property] === object["$id"]) {
           delete object.additionalProperties;
         }
@@ -355,9 +355,6 @@ function buildRoot(object, parentId, type, properties) {
         children: properties[property].children || [],
       });
     }
-        if (object.name === "messages") {
-          console.log(object)
-        }
     const objChildren = object.children;
     for (let i = 0; i < objChildren.length; i++) {
       if (objChildren[i].children.length <= 0) {
@@ -367,46 +364,8 @@ function buildRoot(object, parentId, type, properties) {
   }
 }
 
-function getObject(theObject: any, key: string) {
-  var result = null;
-  if (theObject instanceof Array) {
-    for (var i = 0; i < theObject.length; i++) {
-      result = getObject(theObject[i], key);
-      if (result) {
-        break;
-      }
-    }
-  } else {
-    for (var prop in theObject) {
-      if (prop == key) {
-        if (key === "$ref") {
-          buildChildrenFromRef(theObject, theObject[prop]);
-        }
-        if (key === "additionalProperties") {
-          buildChildrenFromRef(theObject, theObject[prop]);
-        }
-        if (theObject[prop] == 1) {
-          return theObject;
-        }
-      }
-      if (
-        theObject[prop] instanceof Object ||
-        theObject[prop] instanceof Array
-      ) {
-        result = getObject(theObject[prop], key);
-        if (result) {
-          break;
-        }
-      }
-    }
-  }
-  return result;
-}
-
 export default async function buildTree() {
   buildRoot(tree, 1, "initial", null);
-  // getObject(tree, "$ref");
-  // getObject(tree, "additionalProperties");
   writeFileSync(
     resolve(__dirname, `../configs`, "2.5.0.json"),
     JSON.stringify(tree)
