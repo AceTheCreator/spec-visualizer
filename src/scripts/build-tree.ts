@@ -19,15 +19,15 @@ const tree: Array<TreeInterface> = [
   },
 ];
 
-function buildChildrenFromRef(parent, key) {
-  const data = retrieveObj(asyncapi, key);
-  parent = {
-    ...parent,
-    ...data,
-  };
-  const properties = buildProperties(parent, parent.id);
-  buildRoot(parent, parent.id, "children", properties);
-}
+// function buildChildrenFromRef(parent, key) {
+//   const data = retrieveObj(asyncapi, key);
+//   parent = {
+//     ...parent,
+//     ...data,
+//   };
+//   const properties = buildProperties(parent, parent.id);
+//   buildRoot(parent, parent.id, "children", properties);
+// }
 
 function buildFromChildren(object) {
   if (object["$ref"]) {
