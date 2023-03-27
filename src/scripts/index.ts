@@ -11,17 +11,21 @@ interface TreeInterface {
   title: string;
 }
 
-async function startScript<T>(): Promise<T> {
-  const tree = await buildTree();
+const versions: Array<string> = ["2.5.0", "2.6.0"];
+
+async function startScript<T>(version:string): Promise<T> {
+  const tree = await buildTree(version);
   return tree as T;
 }
 
 (async () => {
-  const trees = await startScript<TreeInterface>();
-    writeFileSync(
-      resolve(__dirname, `../configs`, "2.5.0.json"),
-      JSON.stringify(trees)
-    );
+    versions.map(async(version) => {
+          const trees = await startScript<TreeInterface>(version);
+          writeFileSync(
+            resolve(__dirname, `../configs`, `${version}.json`),
+            JSON.stringify(trees)
+          );
+    })
 })().catch((e) => {
   console.log(e);
 });

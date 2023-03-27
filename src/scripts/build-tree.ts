@@ -1,7 +1,9 @@
 import generateDescription from "@/utils/generateDescription";
 import { retrieveObj } from "@/utils/simpleReuse";
-import asyncapi from "@asyncapi/specs/schemas/2.6.0.json";
+import versions from "@asyncapi/specs";
 
+let asyncapi:MyObject = {};
+let version: string = "";
 
 type TreeInterface = {
   id: number;
@@ -249,7 +251,7 @@ function buildProperties(object: PropertiesInterface, parent: number) {
   return newProperty;
 }
 
-function buildObjectDescriptionFromMd(key: string) {
+function buildObjectDescriptionFromMd(key: string, version: string) {
   if (key) {
     const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
     let newKeyName = `${capitalized} Object`;
@@ -303,7 +305,7 @@ function buildObjectDescriptionFromMd(key: string) {
         break;
     }
 
-    const description = generateDescription(newKeyName);
+    const description = generateDescription(newKeyName, version);
     return { title: newKeyName, description };
   }
 }
@@ -313,7 +315,7 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
   if (type === "initial") {
     const properties = buildProperties(asyncapi, parentId);
     object.name = asyncapi.title;
-    const description = generateDescription("AsyncAPI Object");
+    const description = generateDescription("AsyncAPI Object", version);
     object.description = description;
     object.title = "AsyncAPI Object";
     for (const property in properties) {
@@ -322,7 +324,7 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
         properties[property][Object.keys(items)[0]] = Object.values(items)[0];
         delete properties[property].items;
       }
-      const buildDescription = buildObjectDescriptionFromMd(property);
+      const buildDescription = buildObjectDescriptionFromMd(property, version);
       object.children.push({
         ...properties[property],
         parent: parentId,
@@ -352,7 +354,7 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
           properties[property][Object.keys(items)[0]] = Object.values(items)[0];
           delete properties[property].items;
         }
-        const buildDescription = buildObjectDescriptionFromMd(property);
+        const buildDescription = buildObjectDescriptionFromMd(property, version);
         object.children.push({
           ...properties[property],
           parent: parentId || object.id,
@@ -376,7 +378,9 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
   }
 }
 
-export default async function buildTree() {
+export default async function buildTree(version: string) {
+  asyncapi = versions[version];
+  version = version
   buildRoot(tree[0], 1, "initial", null);
   return tree
 }
