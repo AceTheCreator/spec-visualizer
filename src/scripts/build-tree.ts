@@ -1,7 +1,5 @@
 import generateDescription from "@/utils/generateDescription";
 import { retrieveObj } from "@/utils/simpleReuse";
-import { writeFileSync } from "fs";
-import { resolve } from "path";
 import asyncapi from "@asyncapi/specs/schemas/2.6.0.json";
 
 
@@ -380,8 +378,5 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
 
 export default async function buildTree() {
   buildRoot(tree[0], 1, "initial", null);
-  // writeFileSync(
-  //   resolve(__dirname, `../configs`, "2.5.0.json"),
-  //   JSON.stringify(tree)
-  // );
+  return tree
 }
