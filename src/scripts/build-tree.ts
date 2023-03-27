@@ -19,16 +19,6 @@ const tree: Array<TreeInterface> = [
   },
 ];
 
-// function buildChildrenFromRef(parent, key) {
-//   const data = retrieveObj(asyncapi, key);
-//   parent = {
-//     ...parent,
-//     ...data,
-//   };
-//   const properties = buildProperties(parent, parent.id);
-//   buildRoot(parent, parent.id, "children", properties);
-// }
-
 function buildFromChildren(object) {
   if (object["$ref"]) {
     const data = retrieveObj(asyncapi, object["$ref"]);
@@ -122,20 +112,20 @@ function extractAdditionalProps(object, newProperty, parent) {
         if (obj[property] === object["$id"]) {
           delete object.additionalProperties;
         }
-        if(object.oneOf || object.allOf){
+        if (object.oneOf || object.allOf) {
           extractArrayProps(object, newProperty, parent);
         }
-        if(object.properties){
-        const newProps = object.properties;
-        for (const a in newProps){
-          newProperty[a] = newProps[a];
-          newProperty[a].parent = parent;
-          newProperty[a].name = a;
-          newProperty[a].id = String(
-            parseInt(Math.random(100000000) * 1000000)
-          );
-          newProperty[a].children = [];
-        }
+        if (object.properties) {
+          const newProps = object.properties;
+          for (const a in newProps) {
+            newProperty[a] = newProps[a];
+            newProperty[a].parent = parent;
+            newProperty[a].name = a;
+            newProperty[a].id = String(
+              parseInt(Math.random(100000000) * 1000000)
+            );
+            newProperty[a].children = [];
+          }
         }
       } else {
         newProperty[property] = obj[property];
@@ -209,7 +199,7 @@ function extractArrayProps(object, newProperty, parent) {
             newProperty[title].name = title;
             newProperty[title].id = String(
               parseInt(Math.random(100000000) * 1000000)
-            );;
+            );
             newProperty[title].children = [];
           }
         }
@@ -335,25 +325,30 @@ function buildRoot(object, parentId, type, properties) {
     if (!object.children) {
       object["children"] = [];
     }
-    for (const property in properties) {
-      if (properties[property].type === "array" && properties[property].items) {
-        const items = properties[property].items;
-        properties[property][Object.keys(items)[0]] = Object.values(items)[0];
-        delete properties[property].items;
+    if (object.children.length <= 0) {
+      for (const property in properties) {
+        if (
+          properties[property].type === "array" &&
+          properties[property].items
+        ) {
+          const items = properties[property].items;
+          properties[property][Object.keys(items)[0]] = Object.values(items)[0];
+          delete properties[property].items;
+        }
+        const buildDescription = buildObjectDescriptionFromMd(property);
+        object.children.push({
+          ...properties[property],
+          parent: parentId || object.id,
+          name: property,
+          title: buildDescription?.title,
+          description:
+            buildDescription?.description || properties[property].description,
+          id:
+            properties[property].id ||
+            String(parseInt(Math.random(100000000) * 1000000)),
+          children: properties[property].children || [],
+        });
       }
-      const buildDescription = buildObjectDescriptionFromMd(property);
-      object.children.push({
-        ...properties[property],
-        parent: parentId || object.id,
-        name: property,
-        title: buildDescription?.title,
-        description:
-          buildDescription?.description || properties[property].description,
-        id:
-          properties[property].id ||
-          String(parseInt(Math.random(100000000) * 1000000)),
-        children: properties[property].children || [],
-      });
     }
     const objChildren = object.children;
     for (let i = 0; i < objChildren.length; i++) {
