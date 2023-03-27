@@ -1,1 +1,0 @@
-{"$id":"http://asyncapi.com/definitions/2.5.0/SaslSecurityScheme.json","oneOf":[{"$ref":"http://asyncapi.com/definitions/2.5.0/SaslPlainSecurityScheme.json"},{"$ref":"http://asyncapi.com/definitions/2.5.0/SaslScramSecurityScheme.json"},{"$ref":"http://asyncapi.com/definitions/2.5.0/SaslGssapiSecurityScheme.json"}]}

@@ -1,1 +1,0 @@
-{"$id":"http://asyncapi.com/definitions/2.5.0/messages.json","type":"object","additionalProperties":{"$ref":"http://asyncapi.com/definitions/2.5.0/message.json"},"description":"JSON objects describing the messages being consumed and produced by the API."}

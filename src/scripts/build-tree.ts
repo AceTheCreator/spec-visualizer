@@ -1,8 +1,9 @@
 import generateDescription from "@/utils/generateDescription";
 import { retrieveObj } from "@/utils/simpleReuse";
 import { writeFileSync } from "fs";
-import path, { resolve } from "path";
-import asyncapi from "../data/2.5.0/asyncapi.json";
+import { resolve } from "path";
+import asyncapi from "@asyncapi/specs/schemas/2.6.0.json";
+
 
 type TreeInterface = {
   id: number;
@@ -14,21 +15,22 @@ type TreeInterface = {
   title: string
 };
 
-type objType = { [x: string]: any }
+type MyObject = { [x: string]: any };
 
-type PropertiesInterface = TreeInterface & {
-  properties?: objType;
-  additionalProperties?: objType | boolean;
-  patternProperties?: objType;
+interface PropertiesInterface extends TreeInterface {
+  properties?: MyObject;
+  additionalProperties?: PropertiesInterface| MyObject | boolean;
+  patternProperties?: MyObject;
   $id?: string;
   allOf?: Array<TreeInterface>;
   anyOf?: Array<TreeInterface>;
   oneOf?: Array<TreeInterface>;
 };
 
+
 const tree: Array<TreeInterface> = [
   {
-    id: 0,
+    id: 1,
     name: "",
     parent: 0,
     description: "",
@@ -50,7 +52,7 @@ function buildFromChildren(object: TreeInterface) {
   buildRoot(object, object.id, "children", properties);
 }
 
-function extractProps(object:PropertiesInterface, newProperty:objType, parent: number) {
+function extractProps(object:PropertiesInterface, newProperty:MyObject, parent: number) {
   const obj = object.properties;
   for (const property in obj) {
     // TODO: Restructure for message properties
@@ -80,7 +82,7 @@ function extractProps(object:PropertiesInterface, newProperty:objType, parent: n
   }
 }
 
-function extractPatternProps(object:PropertiesInterface, newProperty:objType, parent: number) {
+function extractPatternProps(object:PropertiesInterface, newProperty:MyObject, parent: number) {
   const obj = object.patternProperties;
   if (obj[Object.keys(obj)[0]] && obj[Object.keys(obj)[0]].oneOf) {
     const arrayProps = obj[Object.keys(obj)[0]].oneOf;
@@ -104,7 +106,7 @@ function extractPatternProps(object:PropertiesInterface, newProperty:objType, pa
   }
 }
 
-function extractAdditionalProps(object:PropertiesInterface, newProperty:objType, parent: number) {
+function extractAdditionalProps(object:PropertiesInterface, newProperty:MyObject, parent: number) {
   const obj = object.additionalProperties;
   const arrayProps = obj.oneOf || obj.anyOf;
   if (arrayProps) {
@@ -125,9 +127,6 @@ function extractAdditionalProps(object:PropertiesInterface, newProperty:objType,
           ...object,
           ...data,
         };
-        // if (object.name === "messages") {
-        //   console.log(object);
-        // }
         if (obj[property] === object["$id"]) {
           delete object.additionalProperties;
         }
@@ -162,9 +161,8 @@ function extractAdditionalProps(object:PropertiesInterface, newProperty:objType,
   }
 }
 
-function extractArrayProps(object:PropertiesInterface, newProperty:objType, parent: number) {
+function extractArrayProps(object:PropertiesInterface, newProperty:MyObject, parent: number) {
   if (object.anyOf || object.allOf || object.oneOf) {
-    console.log(object.oneOf);
     const arrayOfProps = object.allOf || object.oneOf;
     if (arrayOfProps) {
       for (let i = 0; i < arrayOfProps.length; i++) {
@@ -312,7 +310,8 @@ function buildObjectDescriptionFromMd(key: string) {
   }
 }
 
-function buildRoot(object:TreeInterface, parentId: number, type: string, properties) {
+function buildRoot(object:TreeInterface, parentId: number, type: string, properties:MyObject) {
+
   if (type === "initial") {
     const properties = buildProperties(asyncapi, parentId);
     object.name = asyncapi.title;
@@ -381,8 +380,8 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
 
 export default async function buildTree() {
   buildRoot(tree[0], 1, "initial", null);
-  writeFileSync(
-    resolve(__dirname, `../configs`, "2.5.0.json"),
-    JSON.stringify(tree)
-  );
+  // writeFileSync(
+  //   resolve(__dirname, `../configs`, "2.5.0.json"),
+  //   JSON.stringify(tree)
+  // );
 }

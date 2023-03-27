@@ -1,1 +1,0 @@
-{"$id":"http://asyncapi.com/definitions/2.5.0/SecurityRequirement.json","type":"object","additionalProperties":{"type":"array","items":{"type":"string"},"uniqueItems":true}}

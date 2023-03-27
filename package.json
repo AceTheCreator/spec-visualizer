@@ -2,6 +2,7 @@
   "name": "asyncapi-view",
   "version": "0.1.0",
   "private": true,
+  "type": "module",
   "scripts": {
     "dev": "tsx src/scripts/index.ts && next -p 3000",
     "build": "next build",
@@ -9,6 +10,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@asyncapi/specs": "^4.2.0",
     "@mdx-js/react": "^2.3.0",
     "@next/font": "13.1.2",
     "@tisoap/react-flow-smart-edge": "^3.0.0",
