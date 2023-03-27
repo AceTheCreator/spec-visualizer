@@ -10,16 +10,35 @@ type TreeInterface = {
   parent: number;
   description: string;
   children: Array<TreeInterface>;
+  "$ref"?: string,
+  title: string
+};
+
+type objType = { [x: string]: any }
+
+type PropertiesInterface = TreeInterface & {
+  properties?: objType;
+  additionalProperties?: objType | boolean;
+  patternProperties?: objType;
+  $id?: string;
+  allOf?: Array<TreeInterface>;
+  anyOf?: Array<TreeInterface>;
+  oneOf?: Array<TreeInterface>;
 };
 
 const tree: Array<TreeInterface> = [
   {
-    id: 1,
+    id: 0,
+    name: "",
+    parent: 0,
+    description: "",
     children: [],
+    title: "",
+    "$ref": ""
   },
 ];
 
-function buildFromChildren(object) {
+function buildFromChildren(object: TreeInterface) {
   if (object["$ref"]) {
     const data = retrieveObj(asyncapi, object["$ref"]);
     object = {
@@ -31,7 +50,7 @@ function buildFromChildren(object) {
   buildRoot(object, object.id, "children", properties);
 }
 
-function extractProps(object, newProperty, parent) {
+function extractProps(object:PropertiesInterface, newProperty:objType, parent: number) {
   const obj = object.properties;
   for (const property in obj) {
     // TODO: Restructure for message properties
@@ -61,7 +80,7 @@ function extractProps(object, newProperty, parent) {
   }
 }
 
-function extractPatternProps(object, newProperty, parent) {
+function extractPatternProps(object:PropertiesInterface, newProperty:objType, parent: number) {
   const obj = object.patternProperties;
   if (obj[Object.keys(obj)[0]] && obj[Object.keys(obj)[0]].oneOf) {
     const arrayProps = obj[Object.keys(obj)[0]].oneOf;
@@ -85,7 +104,7 @@ function extractPatternProps(object, newProperty, parent) {
   }
 }
 
-function extractAdditionalProps(object, newProperty, parent) {
+function extractAdditionalProps(object:PropertiesInterface, newProperty:objType, parent: number) {
   const obj = object.additionalProperties;
   const arrayProps = obj.oneOf || obj.anyOf;
   if (arrayProps) {
@@ -143,8 +162,9 @@ function extractAdditionalProps(object, newProperty, parent) {
   }
 }
 
-function extractArrayProps(object, newProperty, parent) {
+function extractArrayProps(object:PropertiesInterface, newProperty:objType, parent: number) {
   if (object.anyOf || object.allOf || object.oneOf) {
+    console.log(object.oneOf);
     const arrayOfProps = object.allOf || object.oneOf;
     if (arrayOfProps) {
       for (let i = 0; i < arrayOfProps.length; i++) {
@@ -209,7 +229,7 @@ function extractArrayProps(object, newProperty, parent) {
   }
 }
 
-function buildProperties(object: any, parent: number) {
+function buildProperties(object: PropertiesInterface, parent: number) {
   let newProperty: any = {};
   if (object.properties) {
     extractProps(object, newProperty, parent);
@@ -292,13 +312,13 @@ function buildObjectDescriptionFromMd(key: string) {
   }
 }
 
-function buildRoot(object, parentId, type, properties) {
+function buildRoot(object:TreeInterface, parentId: number, type: string, properties) {
   if (type === "initial") {
     const properties = buildProperties(asyncapi, parentId);
-    object[0].name = asyncapi.title;
+    object.name = asyncapi.title;
     const description = generateDescription("AsyncAPI Object");
-    object[0].description = description;
-    object[0].title = "AsyncAPI Object";
+    object.description = description;
+    object.title = "AsyncAPI Object";
     for (const property in properties) {
       if (properties[property].type === "array" && properties[property].items) {
         const items = properties[property].items;
@@ -306,7 +326,7 @@ function buildRoot(object, parentId, type, properties) {
         delete properties[property].items;
       }
       const buildDescription = buildObjectDescriptionFromMd(property);
-      object[0].children.push({
+      object.children.push({
         ...properties[property],
         parent: parentId,
         name: property,
@@ -317,7 +337,7 @@ function buildRoot(object, parentId, type, properties) {
         children: [],
       });
     }
-    const objChildren = object[0].children;
+    const objChildren = object.children;
     for (let i = 0; i < objChildren.length; i++) {
       buildFromChildren(objChildren[i]);
     }
@@ -360,7 +380,7 @@ function buildRoot(object, parentId, type, properties) {
 }
 
 export default async function buildTree() {
-  buildRoot(tree, 1, "initial", null);
+  buildRoot(tree[0], 1, "initial", null);
   writeFileSync(
     resolve(__dirname, `../configs`, "2.5.0.json"),
     JSON.stringify(tree)
