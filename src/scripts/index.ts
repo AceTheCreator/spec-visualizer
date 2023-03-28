@@ -21,7 +21,7 @@ async function startScript<T>(version:string): Promise<T> {
 (async () => {
     versions.map(async(version) => {
           const trees = await startScript<TreeInterface>(version);
-          writeFileSync(
+          return writeFileSync(
             resolve(__dirname, `../configs`, `${version}.json`),
             JSON.stringify(trees)
           );

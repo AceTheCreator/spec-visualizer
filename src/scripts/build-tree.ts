@@ -3,7 +3,7 @@ import { retrieveObj } from "@/utils/simpleReuse";
 import versions from "@asyncapi/specs";
 
 let asyncapi:MyObject = {};
-let version: string = "";
+let specVersion: string = "";
 
 type TreeInterface = {
   id: number;
@@ -311,11 +311,11 @@ function buildObjectDescriptionFromMd(key: string, version: string) {
 }
 
 function buildRoot(object:TreeInterface, parentId: number, type: string, properties:MyObject) {
-
   if (type === "initial") {
     const properties = buildProperties(asyncapi, parentId);
     object.name = asyncapi.title;
-    const description = generateDescription("AsyncAPI Object", version);
+    console.log(asyncapi.title)
+    const description = generateDescription("AsyncAPI Object", specVersion);
     object.description = description;
     object.title = "AsyncAPI Object";
     for (const property in properties) {
@@ -324,7 +324,7 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
         properties[property][Object.keys(items)[0]] = Object.values(items)[0];
         delete properties[property].items;
       }
-      const buildDescription = buildObjectDescriptionFromMd(property, version);
+      const buildDescription = buildObjectDescriptionFromMd(property, specVersion);
       object.children.push({
         ...properties[property],
         parent: parentId,
@@ -354,7 +354,7 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
           properties[property][Object.keys(items)[0]] = Object.values(items)[0];
           delete properties[property].items;
         }
-        const buildDescription = buildObjectDescriptionFromMd(property, version);
+        const buildDescription = buildObjectDescriptionFromMd(property, specVersion);
         object.children.push({
           ...properties[property],
           parent: parentId || object.id,
@@ -380,7 +380,7 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
 
 export default async function buildTree(version: string) {
   asyncapi = versions[version];
-  version = version
+  specVersion = version
   buildRoot(tree[0], 1, "initial", null);
   return tree
 }
