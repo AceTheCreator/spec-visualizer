@@ -13,19 +13,19 @@ interface TreeInterface {
 
 const versions: Array<string> = ["2.5.0", "2.6.0"];
 
-async function startScript<T>(version:string): Promise<T> {
-  const tree = await buildTree(version);
-  return tree as T;
+function startScript(version: string) {
+  const tree = buildTree(version);
+  return tree;
 }
 
 (async () => {
-    versions.map(async(version) => {
-          const trees = await startScript<TreeInterface>(version);
-          return writeFileSync(
-            resolve(__dirname, `../configs`, `${version}.json`),
-            JSON.stringify(trees)
-          );
-    })
+  versions.map(async (version) => {
+    const trees = startScript(version);
+    return writeFileSync(
+      resolve(__dirname, `../configs`, `${version}.json`),
+      JSON.stringify(trees)
+    );
+  });
 })().catch((e) => {
   console.log(e);
 });

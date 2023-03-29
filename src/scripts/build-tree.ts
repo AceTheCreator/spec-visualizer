@@ -2,7 +2,7 @@ import generateDescription from "@/utils/generateDescription";
 import { retrieveObj } from "@/utils/simpleReuse";
 import versions from "@asyncapi/specs";
 
-let asyncapi:MyObject = {};
+let asyncapi: MyObject = {};
 let specVersion: string = "";
 
 type TreeInterface = {
@@ -11,22 +11,21 @@ type TreeInterface = {
   parent: number;
   description: string;
   children: Array<TreeInterface>;
-  "$ref"?: string,
-  title: string
+  $ref?: string;
+  title: string;
 };
 
 type MyObject = { [x: string]: any };
 
 interface PropertiesInterface extends TreeInterface {
   properties?: MyObject;
-  additionalProperties?: PropertiesInterface| MyObject | boolean;
+  additionalProperties?: PropertiesInterface | MyObject | boolean;
   patternProperties?: MyObject;
   $id?: string;
   allOf?: Array<TreeInterface>;
   anyOf?: Array<TreeInterface>;
   oneOf?: Array<TreeInterface>;
-};
-
+}
 
 const tree: Array<TreeInterface> = [
   {
@@ -36,7 +35,7 @@ const tree: Array<TreeInterface> = [
     description: "",
     children: [],
     title: "",
-    "$ref": ""
+    $ref: "",
   },
 ];
 
@@ -52,7 +51,11 @@ function buildFromChildren(object: TreeInterface) {
   buildRoot(object, object.id, "children", properties);
 }
 
-function extractProps(object:PropertiesInterface, newProperty:MyObject, parent: number) {
+function extractProps(
+  object: PropertiesInterface,
+  newProperty: MyObject,
+  parent: number
+) {
   const obj = object.properties;
   for (const property in obj) {
     // TODO: Restructure for message properties
@@ -82,7 +85,11 @@ function extractProps(object:PropertiesInterface, newProperty:MyObject, parent: 
   }
 }
 
-function extractPatternProps(object:PropertiesInterface, newProperty:MyObject, parent: number) {
+function extractPatternProps(
+  object: PropertiesInterface,
+  newProperty: MyObject,
+  parent: number
+) {
   const obj = object.patternProperties;
   if (obj[Object.keys(obj)[0]] && obj[Object.keys(obj)[0]].oneOf) {
     const arrayProps = obj[Object.keys(obj)[0]].oneOf;
@@ -106,7 +113,11 @@ function extractPatternProps(object:PropertiesInterface, newProperty:MyObject, p
   }
 }
 
-function extractAdditionalProps(object:PropertiesInterface, newProperty:MyObject, parent: number) {
+function extractAdditionalProps(
+  object: PropertiesInterface,
+  newProperty: MyObject,
+  parent: number
+) {
   const obj = object.additionalProperties;
   const arrayProps = obj.oneOf || obj.anyOf;
   if (arrayProps) {
@@ -161,7 +172,11 @@ function extractAdditionalProps(object:PropertiesInterface, newProperty:MyObject
   }
 }
 
-function extractArrayProps(object:PropertiesInterface, newProperty:MyObject, parent: number) {
+function extractArrayProps(
+  object: PropertiesInterface,
+  newProperty: MyObject,
+  parent: number
+) {
   if (object.anyOf || object.allOf || object.oneOf) {
     const arrayOfProps = object.allOf || object.oneOf;
     if (arrayOfProps) {
@@ -310,11 +325,15 @@ function buildObjectDescriptionFromMd(key: string, version: string) {
   }
 }
 
-function buildRoot(object:TreeInterface, parentId: number, type: string, properties:MyObject) {
+function buildRoot(
+  object: TreeInterface,
+  parentId: number,
+  type: string,
+  properties: MyObject
+) {
   if (type === "initial") {
     const properties = buildProperties(asyncapi, parentId);
     object.name = asyncapi.title;
-    console.log(asyncapi.title)
     const description = generateDescription("AsyncAPI Object", specVersion);
     object.description = description;
     object.title = "AsyncAPI Object";
@@ -324,7 +343,10 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
         properties[property][Object.keys(items)[0]] = Object.values(items)[0];
         delete properties[property].items;
       }
-      const buildDescription = buildObjectDescriptionFromMd(property, specVersion);
+      const buildDescription = buildObjectDescriptionFromMd(
+        property,
+        specVersion
+      );
       object.children.push({
         ...properties[property],
         parent: parentId,
@@ -354,7 +376,10 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
           properties[property][Object.keys(items)[0]] = Object.values(items)[0];
           delete properties[property].items;
         }
-        const buildDescription = buildObjectDescriptionFromMd(property, specVersion);
+        const buildDescription = buildObjectDescriptionFromMd(
+          property,
+          specVersion
+        );
         object.children.push({
           ...properties[property],
           parent: parentId || object.id,
@@ -378,9 +403,9 @@ function buildRoot(object:TreeInterface, parentId: number, type: string, propert
   }
 }
 
-export default async function buildTree(version: string) {
+export default function buildTree(version: string) {
   asyncapi = versions[version];
-  specVersion = version
+  specVersion = version;
   buildRoot(tree[0], 1, "initial", null);
-  return tree
+  return tree;
 }
