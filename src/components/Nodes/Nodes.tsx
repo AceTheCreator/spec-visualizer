@@ -173,7 +173,7 @@ const Nodes = ({setCurrentNode, passNodes}) => {
         ref={reactFlowWrapper}
         style={{
           width: "100%",
-          height: "100vh",
+          height: "95vh",
         }}
       >
         <ReactFlow

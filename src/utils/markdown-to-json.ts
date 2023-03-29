@@ -1,4 +1,3 @@
-import fs from 'fs';
 import marked from 'marked';
 
 export default function parse (mdContent: string) {
