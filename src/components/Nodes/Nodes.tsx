@@ -1,5 +1,6 @@
 /* eslint-disable import/no-anonymous-default-export */
-import React, { useCallback, useEffect, useRef } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
+import { useRouter } from "next/router";
 import { SmartBezierEdge } from "@tisoap/react-flow-smart-edge";
 import ReactFlow, {
   useNodesState,
@@ -11,12 +12,13 @@ import ReactFlow, {
   ConnectionLineType,
   Edge,
   Node,
-  Connection
+  Connection,
 } from "reactflow";
 import "reactflow/dist/style.css";
 import dagre from "dagre";
-import initialNodes from "../../configs/2.5.0.json";
-import {removeChildren} from "@/utils/simpleReuse";
+import version25 from "../../configs/2.5.0.json";
+import version26 from "../../configs/2.6.0.json";
+import { removeChildren } from "@/utils/simpleReuse";
 
 const initialEdges = [
   {
@@ -69,11 +71,19 @@ const getLayoutedElements = (nodes: any, edges: any, direction = "TB") => {
 };
 
 const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
-  initialNodes,
+  version25,
   initialEdges
 );
 
-const Nodes = ({setCurrentNode, passNodes}) => {
+type MyObject = { [x: string]: any };
+
+const Nodes = ({ setCurrentNode, passNodes }) => {
+  const router = useRouter();
+  const [version, setVersion] = useState(
+    router?.query?.version ? router.query.version : "2.5.0"
+  );
+  let initialNodes: MyObject = version25;
+  // const [initialNodes, setInitialNodes] = useState<MyObject>(version === "2.5.0" ? version25 : version26)
   const reactFlowWrapper = useRef(null);
   const { setCenter } = useReactFlow();
   const [nodes, setNodes, onNodesChange] = useNodesState<Node[]>(layoutedNodes);
@@ -83,7 +93,11 @@ const Nodes = ({setCurrentNode, passNodes}) => {
     (connection: Connection) =>
       setEdges((eds) =>
         addEdge(
-          { ...connection, type: ConnectionLineType.SmoothStep, animated: true },
+          {
+            ...connection,
+            type: ConnectionLineType.SmoothStep,
+            animated: true,
+          },
           eds
         )
       ),
@@ -96,12 +110,20 @@ const Nodes = ({setCurrentNode, passNodes}) => {
   };
 
   useEffect(() => {
+    if (version === "2.6.0") {
+      initialNodes = version26;
+    }
     setNodes([
       ...initialNodes.map((item) => {
         return {
           id: item.id,
           type: item?.children?.length ? "default" : "output",
-          data: { label: item.name, children: item.children, description: item.description, title: item.title },
+          data: {
+            label: item.name,
+            children: item.children,
+            description: item.description,
+            title: item.title,
+          },
           position: { x: 0, y: 0 },
           sourcePosition: "right",
           targetPosition: "left",
@@ -109,7 +131,13 @@ const Nodes = ({setCurrentNode, passNodes}) => {
       }),
     ]);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [version]);
+
+  useEffect(() => {
+    if (router?.query?.version) {
+      setVersion(router.query.version);
+    }
+  }, [router.query]);
 
   const handleNodeClick = (e, data) => {
     const findChildren = nodes.filter((item) => item?.data?.parent === data.id);
@@ -124,7 +152,7 @@ const Nodes = ({setCurrentNode, passNodes}) => {
               children: item.children,
               parent: item.parent,
               description: item.description,
-              title: item.title
+              title: item.title,
             },
             sourcePosition: "right",
             targetPosition: "left",
@@ -147,7 +175,7 @@ const Nodes = ({setCurrentNode, passNodes}) => {
       ];
       const newNodes = nodes.concat(itemChildren);
       const { nodes: layoutedNodes, edges: layoutedEdges } =
-      getLayoutedElements(newNodes, newEdges, "LR");
+        getLayoutedElements(newNodes, newEdges, "LR");
       setNodes([...layoutedNodes]);
       setEdges([...layoutedEdges]);
       if (itemChildren.length) {
@@ -159,42 +187,41 @@ const Nodes = ({setCurrentNode, passNodes}) => {
       setEdges([...edges.filter((item) => data.id !== item.source)]);
     }
   };
-  function handleMouseEnter(e: MouseEvent, data: Node){
+  function handleMouseEnter(e: MouseEvent, data: Node) {
     setCurrentNode(data);
-    passNodes(nodes)
-
+    passNodes(nodes);
   }
   const edgeTypes = {
     smart: SmartBezierEdge,
   };
   return (
-      <div
-        className="wrapper"
-        ref={reactFlowWrapper}
-        style={{
-          width: "100%",
-          height: "95vh",
-        }}
-      >
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          edgeTypes={edgeTypes}
-          onNodesChange={onNodesChange}
-          connectionLineType={ConnectionLineType.SmoothStep}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          onNodeClick={handleNodeClick}
-          onNodeMouseEnter={handleMouseEnter}
-          fitView
-          defaultViewport={{ x: 1, y: 1, zoom: 0.9 }}
-        />
-      </div>
+    <div
+      className="wrapper"
+      ref={reactFlowWrapper}
+      style={{
+        width: "100%",
+        height: "95vh",
+      }}
+    >
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        edgeTypes={edgeTypes}
+        onNodesChange={onNodesChange}
+        connectionLineType={ConnectionLineType.SmoothStep}
+        onEdgesChange={onEdgesChange}
+        onConnect={onConnect}
+        onNodeClick={handleNodeClick}
+        onNodeMouseEnter={handleMouseEnter}
+        fitView
+        defaultViewport={{ x: 1, y: 1, zoom: 0.9 }}
+      />
+    </div>
   );
 };
 
 // eslint-disable-next-line react/display-name
-export default ({setCurrentNode, passNodes}) => (
+export default ({ setCurrentNode, passNodes }) => (
   <ReactFlowProvider>
     <Nodes setCurrentNode={setCurrentNode} passNodes={passNodes} />
   </ReactFlowProvider>

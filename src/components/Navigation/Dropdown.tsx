@@ -1,8 +1,24 @@
-import { useState } from "react";
+import Link from "next/link";
+import { useRouter } from "next/router";
+import { useEffect, useState } from "react";
 
-function Dropdown() {
-    const [show, setShow] = useState<boolean>(false);
-    const [active, setActive] = useState<string>("2.5.0")
+type DropdownProps = {
+  lists: string[];
+  query: string;
+};
+
+const Dropdown: React.FC<DropdownProps> = ({ lists, query }) => {
+  const router = useRouter();
+  const versionFromQuery = router?.query?.version;
+  const [show, setShow] = useState<boolean>(false);
+  const [active, setActive] = useState(
+    versionFromQuery ? versionFromQuery : lists[0]
+  );
+  useEffect(() => {
+    if(versionFromQuery){
+        setActive(versionFromQuery);
+    }
+  },[versionFromQuery])
   return (
     <div className="absolute z-10">
       <button
@@ -40,22 +56,24 @@ function Dropdown() {
           className="py-2 text-sm text-gray-700"
           aria-labelledby="dropdownHoverButton"
         >
-          <li>
-            <a
-              href="#"
-              onClick={() => {
-                setActive("2.6.0");
-                setShow(false)
-              }}
-              className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-100"
-            >
-              2.6.0
-            </a>
-          </li>
+          {lists.map((list) => (
+            <li key={list}>
+              <Link
+                href={{ pathname: "/", query: { version: list } }}
+                onClick={() => {
+                  setActive(list);
+                  setShow(false);
+                }}
+                className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-100"
+              >
+                {list}
+              </Link>
+            </li>
+          ))}
         </ul>
       </div>
     </div>
   );
-}
+};
 
 export default Dropdown;
