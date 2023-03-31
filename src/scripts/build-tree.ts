@@ -27,17 +27,7 @@ interface PropertiesInterface extends TreeInterface {
   oneOf?: Array<TreeInterface>;
 }
 
-const tree: Array<TreeInterface> = [
-  {
-    id: 1,
-    name: "",
-    parent: 0,
-    description: "",
-    children: [],
-    title: "",
-    $ref: "",
-  },
-];
+let tree: Array<TreeInterface> = [];
 
 function buildFromChildren(object: TreeInterface) {
   if (object["$ref"]) {
@@ -404,8 +394,18 @@ function buildRoot(
 }
 
 export default function buildTree(version: string) {
+  const parentLeaf: TreeInterface = {
+    id: 1,
+    name: "",
+    parent: 0,
+    description: "",
+    children: [],
+    title: "",
+    $ref: "",
+  };
   asyncapi = versions[version];
   specVersion = version;
+  tree[0] = parentLeaf
   buildRoot(tree[0], 1, "initial", null);
   return tree;
 }
