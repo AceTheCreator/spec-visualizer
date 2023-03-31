@@ -8,6 +8,11 @@
     "start": "next start",
     "lint": "next lint"
   },
+  "browser": {
+    "fs": false,
+    "path": false,
+    "os": false
+  },
   "dependencies": {
     "@asyncapi/specs": "^4.2.0",
     "@mdx-js/react": "^2.3.0",

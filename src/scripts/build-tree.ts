@@ -1,5 +1,5 @@
 import generateDescription from "@/utils/generateDescription";
-import { retrieveObj } from "@/utils/simpleReuse";
+import { retrieveObj, buildObjectDescriptionFromMd } from "@/utils/simpleReuse";
 import versions from "@asyncapi/specs";
 
 let asyncapi: MyObject = {};
@@ -256,64 +256,6 @@ function buildProperties(object: PropertiesInterface, parent: number) {
   return newProperty;
 }
 
-function buildObjectDescriptionFromMd(key: string, version: string) {
-  if (key) {
-    const capitalized = key.charAt(0).toUpperCase() + key.slice(1);
-    let newKeyName = `${capitalized} Object`;
-
-    // They are some objects i couldn't retrieve programmatically so
-    // i had to add them manually
-    switch (key) {
-      case "externalDocs":
-        newKeyName = "External Documentation Object";
-        break;
-      case "tags":
-        newKeyName = "Tag Object";
-        break;
-      case "schemas":
-        newKeyName = "Schema Object";
-        break;
-      case "publish" || "subscribe":
-        newKeyName = "Operation Object";
-        break;
-      case "operationBindings":
-        newKeyName = "Operation Bindings Object";
-        break;
-      case "operationTraits":
-        newKeyName = "Operation Trait Object";
-        break;
-      case "security":
-        newKeyName = "Security Requirement Object";
-        break;
-      case "SecurityScheme":
-        newKeyName = "Security Scheme Object";
-        break;
-      case "serverVariable":
-        newKeyName = "Server Variable Object";
-        break;
-      case "messageBindings":
-        newKeyName = "Message Bindings Object";
-        break;
-      case "serverBindings":
-        newKeyName = "Server Bindings Object";
-        break;
-      case "channelBindings":
-        newKeyName = "Channel Bindings Object";
-        break;
-      case "correlationIds":
-        newKeyName = "Correlation ID Object";
-        break;
-      case "messageTraits":
-        newKeyName = "Message Trait Object";
-        break;
-      default:
-        break;
-    }
-
-    const description = generateDescription(newKeyName, version);
-    return { title: newKeyName, description };
-  }
-}
 
 function buildRoot(
   object: TreeInterface,
