@@ -256,7 +256,6 @@ function buildProperties(object: PropertiesInterface, parent: number) {
   return newProperty;
 }
 
-
 function buildRoot(
   object: TreeInterface,
   parentId: number,
@@ -312,18 +311,18 @@ function buildRoot(
           property,
           specVersion
         );
-        object.children.push({
-          ...properties[property],
-          parent: parentId || object.id,
-          name: property,
-          title: buildDescription?.title,
-          description:
-            buildDescription?.description || properties[property].description,
-          id:
-            properties[property].id ||
-            String(parseInt(Math.random(100000000) * 1000000)),
-          children: properties[property].children || [],
-        });
+          object.children.push({
+            ...properties[property],
+            parent: parentId || object.id,
+            name: property,
+            title: buildDescription?.title,
+            description:
+              buildDescription?.description || properties[property].description,
+            id:
+              properties[property].id ||
+              String(parseInt(Math.random(100000000) * 1000000)),
+            children: properties[property].children || [],
+          });
       }
     }
     const objChildren = object.children;

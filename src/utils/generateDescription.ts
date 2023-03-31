@@ -10,6 +10,6 @@ export default function generateDescription(objectType: string, version: string)
           parsedContent["AsyncAPI Specification"].Specification.Schema;
 
         const res = retrieveObj(schemaObject, objectType);
-        return res
+         return res;
 
 }

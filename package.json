@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "tsx src/scripts/index.ts && next -p 3000",
-    "build": "next build",
+    "build": "tsx src/scripts/index.ts && next build",
     "start": "next start",
     "lint": "next lint"
   },

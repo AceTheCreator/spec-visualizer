@@ -65,6 +65,9 @@ export function buildObjectDescriptionFromMd(key: string, version: string) {
     // They are some objects i couldn't retrieve programmatically so
     // i had to add them manually
     switch (key) {
+      case "channels":
+        newKeyName = "Channel Item Object";
+        break;
       case "externalDocs":
         newKeyName = "External Documentation Object";
         break;
@@ -74,7 +77,10 @@ export function buildObjectDescriptionFromMd(key: string, version: string) {
       case "schemas":
         newKeyName = "Schema Object";
         break;
-      case "publish" || "subscribe":
+      case "publish":
+        newKeyName = "Operation Object";
+        break;
+      case "subscribe":
         newKeyName = "Operation Object";
         break;
       case "operationBindings":
@@ -112,6 +118,9 @@ export function buildObjectDescriptionFromMd(key: string, version: string) {
     }
 
     const description = generateDescription(newKeyName, version);
+            // if (newKeyName === "Server Bindings Object") {
+            //   console.log(description);
+            // }
     return { title: newKeyName, description };
   }
 }

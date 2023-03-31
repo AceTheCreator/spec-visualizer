@@ -10,6 +10,7 @@ function Sidebar({ node, nodes, setCurrentNode }) {
   const [view, setView] = useState(null);
   const [activeLabel, setActiveLabel] = useState("");
   useEffect(() => {
+    console.log(node)
     if (node?.data && toMarkdown(node.data.description)) {
       setView(node);
     } else {
