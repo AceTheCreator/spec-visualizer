@@ -25,9 +25,6 @@ body{
   height: 100vh;
   overflow-y: scroll;
 }
-.side-bar > h1{
-  font-weight: bold;
-}
 
 th:nth-child(1){
   display: none !important;
