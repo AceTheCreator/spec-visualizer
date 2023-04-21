@@ -75,33 +75,33 @@ function extractProps(
   }
 }
 
-function extractPatternProps(
-  object: PropertiesInterface,
-  newProperty: MyObject,
-  parent: number
-) {
-  const obj = object.patternProperties;
-  if (obj[Object.keys(obj)[0]] && obj[Object.keys(obj)[0]].oneOf) {
-    const arrayProps = obj[Object.keys(obj)[0]].oneOf;
-    for (let i = 0; i < arrayProps.length; i++) {
-      const newRef = arrayProps[i]["$ref"].split("/").slice(-1)[0];
-      const title = newRef.split(".")[0];
-      newProperty[title] = arrayProps[i];
-    }
-    delete obj[Object.keys(obj)[0]];
-  }
-  for (const property in obj) {
-    if (typeof obj[property] === "object") {
-      newProperty[property] = obj[property];
-      newProperty[property].parent = parent;
-      newProperty[property].name = property;
-      newProperty[property].id = String(
-        parseInt(Math.random(100000000) * 1000000)
-      );
-      newProperty[property].children = [];
-    }
-  }
-}
+// function extractPatternProps(
+//   object: PropertiesInterface,
+//   newProperty: MyObject,
+//   parent: number
+// ) {
+//   const obj = object.patternProperties;
+//   if (obj[Object.keys(obj)[0]] && obj[Object.keys(obj)[0]].oneOf) {
+//     const arrayProps = obj[Object.keys(obj)[0]].oneOf;
+//     for (let i = 0; i < arrayProps.length; i++) {
+//       const newRef = arrayProps[i]["$ref"].split("/").slice(-1)[0];
+//       const title = newRef.split(".")[0];
+//       newProperty[title] = arrayProps[i];
+//     }
+//     delete obj[Object.keys(obj)[0]];
+//   }
+//   for (const property in obj) {
+//     if (typeof obj[property] === "object") {
+//       newProperty[property] = obj[property];
+//       newProperty[property].parent = parent;
+//       newProperty[property].name = property;
+//       newProperty[property].id = String(
+//         parseInt(Math.random(100000000) * 1000000)
+//       );
+//       newProperty[property].children = [];
+//     }
+//   }
+// }
 
 function extractAdditionalProps(
   object: PropertiesInterface,
@@ -238,10 +238,10 @@ function buildProperties(object: PropertiesInterface, parent: number) {
     extractProps(object, newProperty, parent);
     delete object.properties;
   }
-  if (object.patternProperties) {
-    extractPatternProps(object, newProperty, parent);
-    delete object.patternProperties;
-  }
+  // if (object.patternProperties) {
+  //   extractPatternProps(object, newProperty, parent);
+  //   delete object.patternProperties;
+  // }
   if (object.additionalProperties && object.additionalProperties !== true) {
     extractAdditionalProps(object, newProperty, parent);
     delete object.additionalProperties;
