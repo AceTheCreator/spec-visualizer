@@ -1,6 +1,6 @@
 import generateDescription from "./generateDescription";
 
-function removeByAttr(arr, attr, value) {
+function removeByAttr(arr: any[], attr:string, value:string) {
   var i = arr.length;
   while (i--) {
     if (

@@ -3,9 +3,9 @@ import marked from 'marked';
 export default function parse (mdContent: string) {
   const aligned = getAlignedContent(mdContent);
   const json = marked.lexer(aligned);
-  let currentHeading,
-    headings = [];
-  const output = json.reduce(function (result, item) {
+  let currentHeading:any,
+    headings:any[] = [];
+  const output = json.reduce(function (result: any[], item) {
     if (!currentHeading) {
       currentHeading = result;
     }
@@ -41,7 +41,7 @@ export default function parse (mdContent: string) {
   return output;
 };
 
-function getAlignedContent(mdContent) {
+function getAlignedContent(mdContent:string) {
   const headings = mdContent.match(/(?:\r\n)#.*$/gm);
   if (!headings) {
     return mdContent.trim();

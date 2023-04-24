@@ -1,6 +1,6 @@
 import traverse from "traverse";
 
-export default function toMarkdown(jsonObject) {
+export default function toMarkdown(jsonObject: object) {
   var mdText = "";
   traverse(jsonObject).reduce(function (acc, value) {
     mdText +=
@@ -12,7 +12,7 @@ export default function toMarkdown(jsonObject) {
   return mdText;
 }
 
-function getHash(level) {
+function getHash(level: number) {
   var hash = "";
   for (var i = 0; i < level; i++) {
     hash += "#";

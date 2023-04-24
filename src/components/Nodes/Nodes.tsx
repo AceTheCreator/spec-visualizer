@@ -75,9 +75,15 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
   initialEdges
 );
 
+
 type MyObject = { [x: string]: any };
 
-const Nodes = ({ setCurrentNode, passNodes }) => {
+type NodeProps = {
+  setCurrentNode: (node: Node) => void;
+  passNodes: (node: typeof layoutedNodes) => void;
+};
+
+const Nodes = ({ setCurrentNode, passNodes }: NodeProps ) => {
   const router = useRouter();
   const [version, setVersion] = useState(
     router?.query?.version ? router.query.version : "2.5.0"
@@ -114,7 +120,7 @@ const Nodes = ({ setCurrentNode, passNodes }) => {
       initialNodes = version26;
     }
     setNodes([
-      ...initialNodes.map((item) => {
+      ...initialNodes.map((item: MyObject) => {
         return {
           id: item.id,
           type: item?.children?.length ? "default" : "output",
@@ -139,11 +145,11 @@ const Nodes = ({ setCurrentNode, passNodes }) => {
     }
   }, [router.query]);
 
-  const handleNodeClick = (e, data) => {
+  const handleNodeClick = (e, data: MyObject) => {
     const findChildren = nodes.filter((item) => item?.data?.parent === data.id);
     if (!findChildren.length) {
       const itemChildren = [
-        ...data.data.children.map((item, i) => {
+        ...data.data.children.map((item: MyObject) => {
           return {
             id: item.id,
             type: item?.children?.length ? "default" : "output",
@@ -164,7 +170,7 @@ const Nodes = ({ setCurrentNode, passNodes }) => {
         ...edges,
         ...itemChildren.map((item) => {
           return {
-            id: String(parseInt(Math.random(100000000) * 1000000)),
+            id: String(Math.floor(Math.random() * 1000000)),
             source: item?.data?.parent,
             target: item?.id,
             markerEnd: {
@@ -187,7 +193,7 @@ const Nodes = ({ setCurrentNode, passNodes }) => {
       setEdges([...edges.filter((item) => data.id !== item.source)]);
     }
   };
-  function handleMouseEnter(e: MouseEvent, data: Node) {
+  function handleMouseEnter(e, data: Node) {
     setCurrentNode(data);
     passNodes(nodes);
   }
@@ -221,7 +227,7 @@ const Nodes = ({ setCurrentNode, passNodes }) => {
 };
 
 // eslint-disable-next-line react/display-name
-export default ({ setCurrentNode, passNodes }) => (
+export default ({ setCurrentNode, passNodes }: NodeProps) => (
   <ReactFlowProvider>
     <Nodes setCurrentNode={setCurrentNode} passNodes={passNodes} />
   </ReactFlowProvider>

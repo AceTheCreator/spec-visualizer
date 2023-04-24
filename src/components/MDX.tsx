@@ -1,6 +1,5 @@
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
-import { useRouter } from "next/router";
-// import { coldarkDark } from "react-syntax-highlighter/dist/esm/styles/prism";
+import PropTypes from "prop-types";
 
 const H1 = ({ children }) => {
   return (
@@ -130,7 +129,6 @@ const CodeComponent = ({ children, inline, props, className = "" }) => {
 
 export const table = TableComponent;
 export const th = TableHead;
-// export const tr = TableRow;
 export const td = TableDirection;
 export const h1 = H1;
 export const h2 = H2;
