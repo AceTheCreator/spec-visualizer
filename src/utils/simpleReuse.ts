@@ -118,9 +118,6 @@ export function buildObjectDescriptionFromMd(key: string, version: string) {
     }
 
     const description = generateDescription(newKeyName, version);
-            // if (newKeyName === "Server Bindings Object") {
-            //   console.log(description);
-            // }
     return { title: newKeyName, description };
   }
 }

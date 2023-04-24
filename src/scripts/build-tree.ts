@@ -2,7 +2,7 @@ import generateDescription from "@/utils/generateDescription";
 import { retrieveObj, buildObjectDescriptionFromMd } from "@/utils/simpleReuse";
 import versions from "@asyncapi/specs";
 
-let asyncapi: MyObject = {};
+let asyncapi: object
 let specVersion: string = "";
 
 type TreeInterface = {
@@ -19,13 +19,22 @@ type MyObject = { [x: string]: any };
 
 interface PropertiesInterface extends TreeInterface {
   properties?: MyObject;
-  additionalProperties?: PropertiesInterface | MyObject | boolean;
+  additionalProperties?: AdditionalProperties;
   patternProperties?: MyObject;
   $id?: string;
+  allOf?: Array<PropertiesInterface>;
+  anyOf?: Array<PropertiesInterface>;
+  oneOf?: Array<PropertiesInterface>;
+}
+
+interface AdditionalProperties extends TreeInterface {
+  items?: Array<TreeInterface>;
+  $ref?: string;
   allOf?: Array<TreeInterface>;
   anyOf?: Array<TreeInterface>;
   oneOf?: Array<TreeInterface>;
 }
+
 
 let tree: Array<TreeInterface> = [];
 
@@ -61,9 +70,7 @@ function extractProps(
       newProperty[property] = obj[property];
       newProperty[property].parent = parent;
       newProperty[property].name = property;
-      newProperty[property].id = String(
-        parseInt(Math.random(100000000) * 1000000)
-      );
+      newProperty[property].id = String(Math.floor(Math.random() * 1000000));
       newProperty[property].children = [];
       if (obj[property].patternProperties) {
         const patterns = obj[property];
@@ -117,18 +124,18 @@ function extractAdditionalProps(
       newProperty[title] = arrayProps[i];
     }
   }
-  if (obj.type === "array" && obj.items) {
+  if (typeof obj === "object" && obj.items) {
     const items = obj.items;
     newProperty[obj[Object.keys(items)[0]]] = Object.values(items)[0];
   } else {
     for (const property in obj) {
-      if (typeof obj[property] === "string") {
+      if (typeof obj[property as keyof AdditionalProperties] === "string") {
         const data = retrieveObj(asyncapi, obj[property]);
         object = {
           ...object,
           ...data,
         };
-        if (obj[property] === object["$id"]) {
+        if (obj[property as keyof AdditionalProperties] === object["$id"]) {
           delete object.additionalProperties;
         }
         if (object.oneOf || object.allOf) {
@@ -140,19 +147,15 @@ function extractAdditionalProps(
             newProperty[a] = newProps[a];
             newProperty[a].parent = parent;
             newProperty[a].name = a;
-            newProperty[a].id = String(
-              parseInt(Math.random(100000000) * 1000000)
-            );
+            newProperty[a].id = String(Math.floor(Math.random() * 1000000));
             newProperty[a].children = [];
           }
         }
       } else {
-        newProperty[property] = obj[property];
+        newProperty[property] = obj[property as keyof AdditionalProperties];
         newProperty[property].parent = parent;
         newProperty[property].name = property;
-        newProperty[property].id = String(
-          parseInt(Math.random(100000000) * 1000000)
-        );
+        newProperty[property].id = String(Math.floor(Math.random() * 1000000));
         newProperty[property].children = [];
       }
     }
@@ -177,9 +180,7 @@ function extractArrayProps(
           newProperty[title] = arrayOfProps[i];
           newProperty[title].parent = parent;
           newProperty[title].name = title;
-          newProperty[title].id = String(
-            parseInt(Math.random(100000000) * 1000000)
-          );
+          newProperty[title].id = String(Math.floor(Math.random() * 1000000));
           newProperty[title].children = [];
         } else {
           const children = arrayOfProps[i];
@@ -189,7 +190,7 @@ function extractArrayProps(
             for (const property in patterns) {
               newProperty[property] = patterns[property];
               newProperty[property].id = String(
-                parseInt(Math.random(100000000) * 1000000)
+                Math.floor(Math.random() * 1000000)
               );
               newProperty[property].name = property;
               newProperty[property].parent = object.id;
@@ -209,7 +210,7 @@ function extractArrayProps(
               }
               newProperty[property] = properties[property];
               newProperty[property].id = String(
-                parseInt(Math.random(100000000) * 1000000)
+                Math.floor(Math.random() * 1000000)
               );
               newProperty[property].name = property;
               newProperty[property].parent = object.id;
@@ -220,9 +221,7 @@ function extractArrayProps(
             newProperty[title] = children.oneOf[1];
             newProperty[title].parent = parent;
             newProperty[title].name = title;
-            newProperty[title].id = String(
-              parseInt(Math.random(100000000) * 1000000)
-            );
+            newProperty[title].id = String(Math.floor(Math.random() * 1000000));
             newProperty[title].children = [];
           }
         }
@@ -285,7 +284,7 @@ function buildRoot(
         title: buildDescription?.title,
         description:
           buildDescription?.description || properties[property].description,
-        id: String(parseInt(Math.random(100000000) * 1000000)),
+        id: String(Math.floor(Math.random() * 1000000)),
         children: [],
       });
     }
@@ -320,7 +319,7 @@ function buildRoot(
               buildDescription?.description || properties[property].description,
             id:
               properties[property].id ||
-              String(parseInt(Math.random(100000000) * 1000000)),
+             String(Math.floor(Math.random() * 1000000)),
             children: properties[property].children || [],
           });
       }
@@ -344,7 +343,7 @@ export default function buildTree(version: string) {
     title: "",
     $ref: "",
   };
-  asyncapi = versions[version];
+  asyncapi = versions[version as keyof typeof versions];
   specVersion = version;
   tree[0] = parentLeaf
   buildRoot(tree[0], 1, "initial", null);
