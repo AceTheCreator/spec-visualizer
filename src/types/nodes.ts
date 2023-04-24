@@ -2,13 +2,15 @@ export type NodeType = {
   id: string;
   name: string;
   parent: number;
-  description: string;
+  description: object;
   children: Array<Node>;
   $ref?: string;
   title: string;
+  label: string;
   targetPosition?: string;
   sourcePosition?: string;
   position?: object;
+  data?: NodeType;
 };
 
 export type EdgeType = {

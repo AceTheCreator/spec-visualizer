@@ -3,9 +3,10 @@ import Sidebar from "@/components/Navigation/Sidebar";
 import { useState } from "react";
 import Nodes from "../components/Nodes/Nodes";
 import versions from "../configs/specVersions.json";
+import { NodeType } from "@/types/nodes";
 
 export default function Home() {
-  const [currentNode, setCurrentNode] = useState({})
+  const [currentNode, setCurrentNode] = useState();
   const [nodes, passNodes] = useState();
   return (
     <div>

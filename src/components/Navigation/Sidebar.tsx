@@ -4,8 +4,15 @@ import React, { useEffect, useState, useRef } from "react";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import * as getMDXComponents from "../MDX";
+import { NodeType } from "@/types/nodes";
 
-function Sidebar({ node, nodes, setCurrentNode }) {
+type Props = {
+  node: NodeType,
+  nodes: NodeType[],
+  setCurrentNode: (node: NodeType) => NodeType,
+}
+
+function Sidebar({ node, nodes, setCurrentNode }: Props) {
   const ref = useRef(null);
   const [view, setView] = useState(null);
   const [activeLabel, setActiveLabel] = useState("");
@@ -17,7 +24,7 @@ function Sidebar({ node, nodes, setCurrentNode }) {
       // any current node
       if (nodes) {
         const findParent = nodes.filter(
-          (item) => item?.id == node?.data?.parent
+          (item: {id: any}) => item?.id == node?.data?.parent
         );
         setCurrentNode(findParent[0]);
       }

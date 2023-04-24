@@ -79,7 +79,7 @@ const { nodes: layoutedNodes, edges: layoutedEdges } = getLayoutedElements(
 type MyObject = { [x: string]: any };
 
 type NodeProps = {
-  setCurrentNode: (node: Node) => void;
+  setCurrentNode: (node: Node) => Node;
   passNodes: (node: typeof layoutedNodes) => void;
 };
 
@@ -145,8 +145,13 @@ const Nodes = ({ setCurrentNode, passNodes }: NodeProps ) => {
     }
   }, [router.query]);
 
-  const handleNodeClick = (e, data: MyObject) => {
-    const findChildren = nodes.filter((item) => item?.data?.parent === data.id);
+  const handleNodeClick = (
+    e,
+    data: MyObject
+  ) => {
+    const findChildren = nodes.filter(
+      (item: any) => item?.data?.parent === data.id
+    );
     if (!findChildren.length) {
       const itemChildren = [
         ...data.data.children.map((item: MyObject) => {
